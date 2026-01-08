@@ -1,0 +1,111 @@
+<div class="min-h-screen flex items-center justify-center bg-black p-5">
+  <div class="bg-white rounded-lg p-10 w-full max-w-md shadow-2xl">
+    <div class="text-center mb-8">
+      <h2 class="text-black text-3xl font-bold mb-2">Connexion</h2>
+      <p class="text-gray-600">Connectez-vous à votre compte</p>
+    </div>
+    
+    @if (errorMessage) {
+      <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
+        {{ errorMessage }}
+      </div>
+    }
+    
+    <form class="space-y-5" (ngSubmit)="onSubmit()" #loginForm="ngForm">
+      <div class="space-y-2">
+        <label for="username" class="block text-black font-semibold text-sm">Nom d'utilisateur</label>
+        <input 
+          type="text" 
+          id="username" 
+          name="username"
+          [(ngModel)]="credentials.username"
+          required 
+          #username="ngModel"
+          placeholder="admin"
+          class="w-full p-3 border-2 border-gray-300 rounded focus:outline-none focus:border-black transition-colors"
+        >
+        @if (username.invalid && username.touched) {
+          <div class="text-black text-xs font-medium">
+            @if (username.errors?.['required']) {
+              <span>Le nom d'utilisateur est requis</span>
+            }
+          </div>
+        }
+      </div>
+
+      <div class="space-y-2">
+        <label for="password" class="block text-black font-semibold text-sm">Mot de passe</label>
+        <div class="relative">
+          <input 
+            [type]="showPassword ? 'text' : 'password'" 
+            id="password" 
+            name="password"
+            [(ngModel)]="credentials.password"
+            required 
+            minlength="6"
+            #password="ngModel"
+            placeholder="••••••••"
+            class="w-full p-3 pr-10 border-2 border-gray-300 rounded focus:outline-none focus:border-black transition-colors"
+          >
+          <button 
+            type="button" 
+            class="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-600 hover:text-black"
+            (click)="togglePassword()"
+          >
+            @if (!showPassword) {
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" stroke="currentColor" stroke-width="2" fill="none"/>
+                <circle cx="12" cy="12" r="3" stroke="currentColor" stroke-width="2" fill="none"/>
+              </svg>
+            }
+            @if (showPassword) {
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+                <path d="m1 1 22 22" stroke="currentColor" stroke-width="2"/>
+                <path d="M6.71 6.71C4.68 8.04 3 10.5 3 12s1.68 3.96 3.71 5.29" stroke="currentColor" stroke-width="2" fill="none"/>
+                <path d="M17.29 17.29C19.32 15.96 21 13.5 21 12s-1.68-3.96-3.71-5.29" stroke="currentColor" stroke-width="2" fill="none"/>
+              </svg>
+            }
+          </button>
+        </div>
+        @if (password.invalid && password.touched) {
+          <div class="text-black text-xs font-medium">
+            @if (password.errors?.['required']) {
+              <span>Le mot de passe est requis</span>
+            }
+            @if (password.errors?.['minlength']) {
+              <span>Minimum 6 caractères</span>
+            }
+          </div>
+        }
+      </div>
+
+      <div class="flex justify-between items-center">
+        <label class="flex items-center space-x-2 text-sm text-gray-600 cursor-pointer">
+          <input type="checkbox" [(ngModel)]="rememberMe" name="rememberMe" class="rounded">
+          <span>Se souvenir de moi</span>
+        </label>
+        <a href="#" class="text-black text-sm font-medium hover:underline">Mot de passe oublié ?</a>
+      </div>
+
+      <button 
+        type="submit" 
+        class="w-full bg-black text-white p-3 rounded font-semibold hover:bg-gray-800 disabled:opacity-60 disabled:cursor-not-allowed min-h-12 flex items-center justify-center transition-colors"
+        [disabled]="loginForm.invalid || isLoading"
+      >
+        @if (!isLoading) {
+          <span>Se connecter</span>
+        }
+        @if (isLoading) {
+          <div class="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
+        }
+      </button>
+    </form>
+
+    <div class="text-center mt-6 pt-6 border-t border-gray-300">
+      <p class="text-gray-600 text-sm">
+        Pas encore de compte ? 
+        <a href="#" class="text-black font-semibold hover:underline">S'inscrire</a>
+      </p>
+    </div>
+  </div>
+</div>
