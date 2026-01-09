@@ -5,28 +5,25 @@
       <p class="text-gray-600">Connectez-vous à votre compte</p>
     </div>
     
-    @if (errorMessage) {
+    @if (errorMessage()) {
       <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
-        {{ errorMessage }}
+        {{ errorMessage() }}
       </div>
     }
     
-    <form class="space-y-5" (ngSubmit)="onSubmit()" #loginForm="ngForm">
+    <form class="space-y-5" [formGroup]="loginForm" (ngSubmit)="onSubmit()">
       <div class="space-y-2">
         <label for="username" class="block text-black font-semibold text-sm">Nom d'utilisateur</label>
         <input 
           type="text" 
           id="username" 
-          name="username"
-          [(ngModel)]="credentials.username"
-          required 
-          #username="ngModel"
+          formControlName="username"
           placeholder="admin"
           class="w-full p-3 border-2 border-gray-300 rounded focus:outline-none focus:border-black transition-colors"
         >
-        @if (username.invalid && username.touched) {
+        @if (loginForm.get('username')?.invalid && loginForm.get('username')?.touched) {
           <div class="text-black text-xs font-medium">
-            @if (username.errors?.['required']) {
+            @if (loginForm.get('username')?.errors?.['required']) {
               <span>Le nom d'utilisateur est requis</span>
             }
           </div>
@@ -37,13 +34,9 @@
         <label for="password" class="block text-black font-semibold text-sm">Mot de passe</label>
         <div class="relative">
           <input 
-            [type]="showPassword ? 'text' : 'password'" 
+            [type]="showPassword() ? 'text' : 'password'" 
             id="password" 
-            name="password"
-            [(ngModel)]="credentials.password"
-            required 
-            minlength="6"
-            #password="ngModel"
+            formControlName="password"
             placeholder="••••••••"
             class="w-full p-3 pr-10 border-2 border-gray-300 rounded focus:outline-none focus:border-black transition-colors"
           >
@@ -52,13 +45,13 @@
             class="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-600 hover:text-black"
             (click)="togglePassword()"
           >
-            @if (!showPassword) {
+            @if (!showPassword()) {
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
                 <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" stroke="currentColor" stroke-width="2" fill="none"/>
                 <circle cx="12" cy="12" r="3" stroke="currentColor" stroke-width="2" fill="none"/>
               </svg>
             }
-            @if (showPassword) {
+            @if (showPassword()) {
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
                 <path d="m1 1 22 22" stroke="currentColor" stroke-width="2"/>
                 <path d="M6.71 6.71C4.68 8.04 3 10.5 3 12s1.68 3.96 3.71 5.29" stroke="currentColor" stroke-width="2" fill="none"/>
@@ -67,12 +60,12 @@
             }
           </button>
         </div>
-        @if (password.invalid && password.touched) {
+        @if (loginForm.get('password')?.invalid && loginForm.get('password')?.touched) {
           <div class="text-black text-xs font-medium">
-            @if (password.errors?.['required']) {
+            @if (loginForm.get('password')?.errors?.['required']) {
               <span>Le mot de passe est requis</span>
             }
-            @if (password.errors?.['minlength']) {
+            @if (loginForm.get('password')?.errors?.['minlength']) {
               <span>Minimum 6 caractères</span>
             }
           </div>
@@ -81,7 +74,7 @@
 
       <div class="flex justify-between items-center">
         <label class="flex items-center space-x-2 text-sm text-gray-600 cursor-pointer">
-          <input type="checkbox" [(ngModel)]="rememberMe" name="rememberMe" class="rounded">
+          <input type="checkbox" [checked]="rememberMe()" (change)="rememberMe.set($event.target.checked)" class="rounded">
           <span>Se souvenir de moi</span>
         </label>
         <a href="#" class="text-black text-sm font-medium hover:underline">Mot de passe oublié ?</a>
@@ -90,12 +83,12 @@
       <button 
         type="submit" 
         class="w-full bg-black text-white p-3 rounded font-semibold hover:bg-gray-800 disabled:opacity-60 disabled:cursor-not-allowed min-h-12 flex items-center justify-center transition-colors"
-        [disabled]="loginForm.invalid || isLoading"
+        [disabled]="loginForm.invalid || isLoading()"
       >
-        @if (!isLoading) {
+        @if (!isLoading()) {
           <span>Se connecter</span>
         }
-        @if (isLoading) {
+        @if (isLoading()) {
           <div class="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
         }
       </button>

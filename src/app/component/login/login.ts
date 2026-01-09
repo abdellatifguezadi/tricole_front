@@ -1,53 +1,69 @@
-import { Component, inject } from '@angular/core';
-import { FormsModule } from '@angular/forms';
+import { Component, inject, signal, OnInit } from '@angular/core';
+import { ReactiveFormsModule, FormBuilder, Validators } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { Auth } from '../../services/authService/auth';
 import { Router } from '@angular/router';
+import { catchError, finalize, tap, of } from 'rxjs';
 
 @Component({
   selector: 'app-login',
-  imports: [FormsModule, CommonModule],
+  standalone: true,
+  imports: [ReactiveFormsModule, CommonModule],
   templateUrl: './login.html',
   styleUrl: './login.css',
 })
-export class Login {
+export class Login implements OnInit {
+
   private authService = inject(Auth);
   private router = inject(Router);
+  private fb = inject(FormBuilder);
 
-  credentials = {
-    username: '',
-    password: ''
-  };
+  loginForm = this.fb.nonNullable.group({
+    username: ['', Validators.required],
+    password: ['', [Validators.required, Validators.minLength(6)]],
+  });
 
-  showPassword = false;
-  rememberMe = false;
-  isLoading = false;
-  errorMessage = '';
+  showPassword = signal(false);
+  isLoading = signal(false);
+  errorMessage = signal('');
+  rememberMe = signal(false);
+
+  ngOnInit() {
+    if (this.authService.isAuthenticated()) {
+      const roleRoute = this.authService.getRoleBasedRoute();
+      this.router.navigate([roleRoute]);
+    }
+  }
 
   togglePassword() {
-    this.showPassword = !this.showPassword;
+    this.showPassword.update(v => !v);
   }
 
   onSubmit() {
-    if (this.credentials.username && this.credentials.password) {
-      this.isLoading = true;
-      this.errorMessage = '';
+    if (this.loginForm.invalid || this.isLoading()) return;
 
-      this.authService.login({
-        username: this.credentials.username,
-        password: this.credentials.password
-      }).subscribe({
-        next: (response) => {
-          this.isLoading = false;
-          console.log('Login successful:', response);
-          this.router.navigate(['/admin_dashboard']);
-        },
-        error: (error) => {
-          this.isLoading = false;
-          this.errorMessage = 'Nom d\'utilisateur ou mot de passe incorrect';
-          console.error('Login error:', error);
-        }
-      });
-    }
+    this.isLoading.set(true);
+    this.errorMessage.set('');
+
+    this.authService.login(this.loginForm.getRawValue()).pipe(
+
+      tap(() => {
+        const roleRoute = this.authService.getRoleBasedRoute();
+        this.router.navigate([roleRoute]);
+      }),
+
+      catchError(err => {
+        console.error(err);
+        let message = err.error.error;
+
+        this.errorMessage.set(message);
+        return of(null);
+      }),
+
+      finalize(() => {
+        this.isLoading.set(false);
+      })
+
+    ).subscribe();
   }
 }

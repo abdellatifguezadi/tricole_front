@@ -1,0 +1,14 @@
+<div class="bg-white border border-gray-200 rounded-lg p-4 hover:shadow-md transition-all duration-300 hover:border-black">
+  <div class="flex items-center justify-between">
+    <div class="flex items-center space-x-3">
+      <div class="bg-gray-800 rounded-lg p-2">
+        <ng-content></ng-content>
+      </div>
+      <div>
+        <p class="text-xs font-medium text-gray-600 uppercase tracking-wide">{{title}}</p>
+        <p class="text-xl font-bold text-black mt-1">{{value}}</p>
+      </div>
+    </div>
+    <div class="w-1 h-8 bg-gray-800 rounded-full"></div>
+  </div>
+</div>

@@ -1,17 +1,20 @@
 import { Injectable, Inject, PLATFORM_ID } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable, BehaviorSubject } from 'rxjs';
+import { BehaviorSubject, Observable } from 'rxjs';
 import { tap } from 'rxjs/operators';
 import { isPlatformBrowser } from '@angular/common';
-import { LoginRequest, LoginResponse } from '../../models';
+
+import { LoginRequest, LoginResponse , User } from '../../models';
 
 @Injectable({
   providedIn: 'root',
 })
 export class Auth {
+
   private apiUrl = 'http://localhost:8080/api/auth';
-  private currentUserSubject = new BehaviorSubject<any>(null);
-  public currentUser$ = this.currentUserSubject.asObservable();
+
+  private currentUserSubject = new BehaviorSubject<User | null>(null);
+  currentUser$ = this.currentUserSubject.asObservable();
 
   constructor(
     private http: HttpClient,
@@ -20,32 +23,50 @@ export class Auth {
     this.loadStoredUser();
   }
 
+
   login(credentials: LoginRequest): Observable<LoginResponse> {
-    return this.http.post<LoginResponse>(`${this.apiUrl}/login`, credentials , { withCredentials: true })
+    return this.http
+      .post<LoginResponse>(
+        `${this.apiUrl}/login`,
+        credentials,
+        { withCredentials: true }
+      )
       .pipe(
-        tap(response => {
-          if (isPlatformBrowser(this.platformId)) {
-            localStorage.setItem('accessToken', response.accessToken);
-            localStorage.setItem('tokenType', response.tokenType);
-            localStorage.setItem('user', JSON.stringify({
-              userId: response.userId,
-              username: response.username,
-              email: response.email,
-              role: response.role
-            }));
-          }
-          this.currentUserSubject.next(response);
-        })
+        tap(res => this.handleAuthSuccess(res))
       );
   }
 
+
+  register(data: any): Observable<any> {
+    return this.http.post(
+      `${this.apiUrl}/register`,
+      data
+    );
+  }
+
+
   logout(): void {
     if (isPlatformBrowser(this.platformId)) {
-      localStorage.removeItem('accessToken');
-      localStorage.removeItem('tokenType');
-      localStorage.removeItem('user');
+      localStorage.clear();
     }
     this.currentUserSubject.next(null);
+  }
+
+
+  refreshToken(): Observable<LoginResponse> {
+    return this.http
+      .post<LoginResponse>(
+        `${this.apiUrl}/refresh`,
+        {},
+        { withCredentials: true }
+      )
+      .pipe(
+        tap(res => {
+          if (isPlatformBrowser(this.platformId)) {
+            localStorage.setItem('accessToken', res.accessToken);
+          }
+        })
+      );
   }
 
   getAccessToken(): string | null {
@@ -56,34 +77,54 @@ export class Auth {
   }
 
   isAuthenticated(): boolean {
-    return !!this.getAccessToken();
+    return this.currentUserSubject.value !== null;
   }
 
-  getCurrentUser(): any {
+
+  getCurrentUser(): User | null {
     return this.currentUserSubject.value;
   }
 
-  refreshToken(): Observable<LoginResponse> {
-    return this.http.post<LoginResponse>(
-      `${this.apiUrl}/refresh`,
-      {},
-      { withCredentials: true }
-    ).pipe(
-      tap(response => {
-        if (isPlatformBrowser(this.platformId)) {
-          localStorage.setItem('accessToken', response.accessToken);
-        }
-      })
-    );
+  getRoleBasedRoute(): string {
+    const user = this.currentUserSubject.value;
+    if (!user) return '/login';
+
+    switch (user.role.toLowerCase()) {
+      case 'admin':
+        return '/admin_dashboard';
+      case 'user':
+        return '/user_dashboard';
+      case 'manager':
+        return '/manager_dashboard';
+      default:
+        return '/login';
+    }
   }
 
 
+  private handleAuthSuccess(res: LoginResponse): void {
+    if (!isPlatformBrowser(this.platformId)) return;
+
+    const user: User = {
+      userId: res.userId,
+      username: res.username,
+      email: res.email,
+      role: res.role,
+    };
+
+    localStorage.setItem('accessToken', res.accessToken);
+    localStorage.setItem('tokenType', res.tokenType);
+    localStorage.setItem('user', JSON.stringify(user));
+
+    this.currentUserSubject.next(user);
+  }
+
   private loadStoredUser(): void {
-    if (isPlatformBrowser(this.platformId)) {
-      const user = localStorage.getItem('user');
-      if (user) {
-        this.currentUserSubject.next(JSON.parse(user));
-      }
+    if (!isPlatformBrowser(this.platformId)) return;
+
+    const user = localStorage.getItem('user');
+    if (user) {
+      this.currentUserSubject.next(JSON.parse(user));
     }
   }
 }

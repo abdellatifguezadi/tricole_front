@@ -1,0 +1,20 @@
+/* Styles pour le dashboard admin */
+.dashboard-container {
+  background-color: #f9fafb;
+}
+
+.stat-card {
+  transition: transform 0.2s ease-in-out;
+}
+
+.stat-card:hover {
+  transform: translateY(-2px);
+}
+
+.chart-card {
+  min-height: 200px;
+}
+
+.loading-spinner {
+  border-top-color: transparent;
+}
