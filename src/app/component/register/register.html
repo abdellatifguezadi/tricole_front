@@ -1,0 +1,68 @@
+<div class="min-h-screen flex items-center justify-center bg-black p-5">
+  <div class="bg-white rounded-lg p-10 w-full max-w-md shadow-2xl">
+    <div class="text-center mb-8">
+      <h2 class="text-black text-3xl font-bold mb-2">Inscription</h2>
+      <p class="text-gray-600">Créez votre compte</p>
+    </div>
+    
+    @if (errorMessage()) {
+      <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
+        {{ errorMessage() }}
+      </div>
+    }
+    
+    <form class="space-y-5" [formGroup]="registerForm" (ngSubmit)="submit()">
+      <app-input-field
+        label="Nom complet"
+        type="text"
+        placeholder="John Doe"
+        formControlName="fullName"
+        [error]="registerForm.get('fullName')?.invalid && registerForm.get('fullName')?.touched ? 'Le nom complet est requis' : ''">
+      </app-input-field>
+
+      <app-input-field
+        label="Nom d'utilisateur"
+        type="text"
+        placeholder="johndoe"
+        formControlName="username"
+        [error]="registerForm.get('username')?.invalid && registerForm.get('username')?.touched ? 'Le nom d\'utilisateur est requis' : ''">
+      </app-input-field>
+
+      <app-input-field
+        label="Email"
+        type="email"
+        placeholder="john@example.com"
+        formControlName="email"
+        [error]="registerForm.get('email')?.invalid && registerForm.get('email')?.touched ? 'Email valide requis' : ''">
+      </app-input-field>
+
+      <app-input-field
+        label="Mot de passe"
+        type="password"
+        placeholder="••••••••"
+        formControlName="password"
+        [error]="registerForm.get('password')?.invalid && registerForm.get('password')?.touched ? 'Le mot de passe est requis' : ''">
+      </app-input-field>
+
+      <button 
+        type="submit" 
+        class="w-full bg-black text-white p-3 rounded font-semibold hover:bg-gray-800 disabled:opacity-60 disabled:cursor-not-allowed min-h-12 flex items-center justify-center transition-colors"
+        [disabled]="registerForm.invalid || isLoading()"
+      >
+        @if (!isLoading()) {
+          <span>S'inscrire</span>
+        }
+        @if (isLoading()) {
+          <div class="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
+        }
+      </button>
+    </form>
+
+    <div class="text-center mt-6 pt-6 border-t border-gray-300">
+      <p class="text-gray-600 text-sm">
+        Déjà un compte ? 
+        <a (click)="navigateToLogin()" class="text-black font-semibold hover:underline cursor-pointer">Se connecter</a>
+      </p>
+    </div>
+  </div>
+</div>

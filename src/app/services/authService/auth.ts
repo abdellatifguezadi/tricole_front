@@ -85,6 +85,16 @@ export class Auth {
     return this.currentUserSubject.value;
   }
 
+  hasPermission(authority: string): boolean {
+    const user = this.getCurrentUser();
+    return user?.authorities?.includes(authority) || false;
+  }
+
+  hasAnyPermission(authorities: string[]): boolean {
+    const user = this.getCurrentUser();
+    return authorities.some(authority => user?.authorities?.includes(authority)) || false;
+  }
+
   getRoleBasedRoute(): string {
     const user = this.currentUserSubject.value;
     if (!user) return '/login';
@@ -96,6 +106,8 @@ export class Auth {
         return '/user_dashboard';
       case 'manager':
         return '/manager_dashboard';
+      case 'magasinier':
+        return '/magasinier_dashboard';
       default:
         return '/login';
     }
@@ -110,6 +122,7 @@ export class Auth {
       username: res.username,
       email: res.email,
       role: res.role,
+      authorities: res.authorities
     };
 
     localStorage.setItem('accessToken', res.accessToken);

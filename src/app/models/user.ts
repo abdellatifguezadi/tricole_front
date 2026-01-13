@@ -1,6 +1,4 @@
-export interface LoginResponse {
-  accessToken: string;
-  tokenType: string;
+export interface User {
   userId: number;
   username: string;
   email: string;

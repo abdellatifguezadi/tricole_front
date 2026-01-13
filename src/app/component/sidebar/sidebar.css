@@ -1,0 +1,21 @@
+/* Custom sidebar styles */
+:host {
+  display: contents;
+}
+
+/* Ensure transform classes work */
+.translate-x-0 {
+  transform: translateX(0);
+}
+
+.-translate-x-full {
+  transform: translateX(-100%);
+}
+
+/* Responsive: always show on large screens */
+@media (min-width: 1024px) {
+  nav {
+    transform: translateX(0) !important;
+  }
+}
+

@@ -4,8 +4,13 @@ import { Auth } from './auth';
 
 export const AuthInterceptor: HttpInterceptorFn = (req, next) => {
   const authService = inject(Auth);
+  
+  // Skip interceptor for auth endpoints
+  if (req.url.includes('/api/auth/')) {
+    return next(req);
+  }
+  
   const token = authService.getAccessToken();
-
 
   if (token) {
     req = req.clone({

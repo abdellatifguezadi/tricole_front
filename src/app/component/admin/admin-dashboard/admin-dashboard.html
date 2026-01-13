@@ -1,13 +1,21 @@
-<div class="flex min-h-screen bg-gray-50">
-  <app-sidebar></app-sidebar>
+<div class="min-h-screen bg-gray-50">
+  <app-sidebar [open]="sidebarOpen" (closeSidebar)="toggleSidebar()"></app-sidebar>
 
-  <div class="flex-1 ml-[260px]">
-    <!-- Header -->
+  <div class="p-8 lg:ml-[260px]">
     <div class="bg-white border-b border-gray-200 px-8 py-6">
       <div class="flex items-center justify-between">
-        <div>
-          <h1 class="text-3xl font-bold text-gray-800">Dashboard Admin</h1>
-          <p class="text-gray-600 mt-1">Vue d'ensemble des statistiques</p>
+        <div class="flex items-center gap-3">
+          <!-- Mobile hamburger -->
+          <button (click)="toggleSidebar()" type="button" class="inline-flex items-center justify-center p-2 bg-gray-800 text-white rounded-md hover:bg-gray-700 lg:hidden">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16"></path>
+            </svg>
+          </button>
+
+          <div>
+            <h1 class="text-3xl font-bold text-gray-800">Dashboard Admin</h1>
+            <p class="text-gray-600 mt-1">Vue d'ensemble des statistiques</p>
+          </div>
         </div>
         <div class="w-12 h-12 bg-gray-800 rounded-full flex items-center justify-center">
           <svg class="w-6 h-6 text-white" fill="currentColor" viewBox="0 0 20 20">
@@ -19,6 +27,11 @@
 
     <!-- Content -->
     <div class="p-8">
+      <app-error-message
+        [error]="error"
+        (retry)="loadStats()">
+      </app-error-message>
+
       @if (stats) {
       <div class="space-y-8">
         <!-- Statistiques principales -->

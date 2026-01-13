@@ -1,0 +1,41 @@
+/* Tailwind CSS utilisé */
+
+/* Responsive margin for main content */
+@media (min-width: 1024px) {
+  .lg\:ml-\[260px\] {
+    margin-left: 260px;
+  }
+}
+
+/* Ensure hamburger button is visible on mobile */
+button.lg\:hidden {
+  display: inline-flex;
+}
+
+@media (min-width: 1024px) {
+  button.lg\:hidden {
+    display: none;
+  }
+}
+
+/* Hide table on mobile, show cards */
+.hidden.lg\:block {
+  display: none;
+}
+
+@media (min-width: 1024px) {
+  .hidden.lg\:block {
+    display: block;
+  }
+}
+
+/* Show cards on mobile, hide on desktop */
+.block.lg\:hidden {
+  display: block;
+}
+
+@media (min-width: 1024px) {
+  .block.lg\:hidden {
+    display: none;
+  }
+}

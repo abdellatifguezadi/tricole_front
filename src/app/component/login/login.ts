@@ -4,11 +4,12 @@ import { CommonModule } from '@angular/common';
 import { Auth } from '../../services/authService/auth';
 import { Router } from '@angular/router';
 import { catchError, finalize, tap, of } from 'rxjs';
+import { InputField } from '../input-field/input-field';
 
 @Component({
   selector: 'app-login',
   standalone: true,
-  imports: [ReactiveFormsModule, CommonModule],
+  imports: [ReactiveFormsModule, CommonModule, InputField],
   templateUrl: './login.html',
   styleUrl: './login.css',
 })
@@ -65,5 +66,9 @@ export class Login implements OnInit {
       })
 
     ).subscribe();
+  }
+
+  navigateToRegister() {
+    this.router.navigate(['/register']);
   }
 }
