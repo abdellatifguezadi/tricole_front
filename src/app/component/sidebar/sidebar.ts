@@ -24,7 +24,7 @@ export class Sidebar {
   menu = [
     {
       label: 'Dashboard Admin',
-      icon: 'home',
+      icon: 'dashboard',
       link: '/admin_dashboard',
       authorities: ['USER_MANAGE', 'STATISTIQUES_READ']
     },
@@ -43,7 +43,7 @@ export class Sidebar {
     {
       label: 'Produits',
       icon: 'category',
-      link: '/produits',
+      link: '/product',
       authorities: ['PRODUIT_READ']
     },
     {

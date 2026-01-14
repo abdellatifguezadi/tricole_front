@@ -1,69 +1,69 @@
-<div class="min-h-screen bg-white mt-10">
+
+<div class="min-h-screen bg-teal-50 pt-8 ">
   <app-sidebar [open]="sidebarOpen" (closeSidebar)="toggleSidebar()"></app-sidebar>
 
   <div class="p-6 lg:ml-[260px]">
     <div class="flex items-center justify-between mb-6">
       <div class="flex items-center gap-3">
         <!-- Mobile hamburger -->
-        <button (click)="toggleSidebar()" type="button" class="inline-flex items-center justify-center p-2 bg-gray-800 text-white rounded-md hover:bg-gray-700 lg:hidden">
-          <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16"></path>
-          </svg>
+        <button
+          (click)="toggleSidebar()"
+          type="button"
+          class="inline-flex items-center justify-center p-2 bg-teal-700 text-white rounded-md hover:bg-teal-800 lg:hidden"
+        >
+          <span class="material-icons text-white text-lg">menu</span>
         </button>
         <h1 class="text-2xl font-bold text-gray-800">Gestion des Fournisseurs</h1>
       </div>
-      <button class="bg-gray-800 text-white px-4 py-2 rounded-lg hover:bg-gray-700">
+      <button class="bg-teal-700 text-white px-4 py-2 rounded-lg hover:bg-teal-800">
         Ajouter Fournisseur
       </button>
     </div>
 
-    <app-error-message
-      [error]="error"
-      (retry)="loadFournisseurs()">
-    </app-error-message>
+    <app-error-message [error]="error" (retry)="loadFournisseurs()"> </app-error-message>
+
+    <!-- Loading state -->
+    @if (loading) {
+    <div class="flex justify-center items-center py-8">
+      <div class="animate-spin rounded-full h-6 w-6 border-b-2 border-teal-600"></div>
+      <span class="ml-3 text-gray-600">Chargement...</span>
+    </div>
+    }
 
     <!-- Table visible on desktop -->
     @if (!loading) {
-      <div class="hidden lg:block">
-        <app-table
-          [columns]="columns"
-          [data]="fournisseurs"
-          [actions]="actions"
-          [loading]="loading"
-          emptyMessage="Aucun fournisseur trouvé"
-          (actionClick)="onTableAction($event.action, $event.item)">
-        </app-table>
-      </div>
+    <div class="hidden lg:block">
+      <app-table
+        [columns]="columns"
+        [data]="fournisseurs"
+        [actions]="actions"
+        [loading]="loading"
+        emptyMessage="Aucun fournisseur trouvé"
+        (actionClick)="onTableAction($event.action, $event.item)"
+      >
+      </app-table>
+    </div>
     }
 
     <!-- Cards for tablet & mobile -->
     @if (!loading && fournisseurs.length > 0) {
-      <div class="block lg:hidden space-y-3">
-        @for (f of fournisseurs; track f.id) {
-          <app-mobile-card
-            [data]="f"
-            [fields]="cardFields"
-            titleField="raisonSociale"
-            [actions]="actions"
-            [onAction]="onTableAction">
-          </app-mobile-card>
-        }
-      </div>
+    <div class="block lg:hidden space-y-3">
+      @for (f of fournisseurs; track f.id) {
+      <app-mobile-card
+        [data]="f"
+        [fields]="cardFields"
+        titleField="raisonSociale"
+        [actions]="actions"
+        [onAction]="onTableAction"
+      >
+      </app-mobile-card>
+      }
+    </div>
     }
 
     <!-- Empty state on mobile/tablet -->
     @if (!loading && fournisseurs.length === 0) {
-      <div class="block lg:hidden text-center py-8 text-gray-500">
-        Aucun fournisseur trouvé
-      </div>
-    }
-
-    <!-- Loading state -->
-    @if (loading) {
-      <div class="flex justify-center items-center py-8">
-        <div class="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-600"></div>
-        <span class="ml-3 text-gray-600">Chargement...</span>
-      </div>
+    <div class="block lg:hidden text-center py-8 text-gray-500">Aucun fournisseur trouvé</div>
     }
   </div>
 </div>

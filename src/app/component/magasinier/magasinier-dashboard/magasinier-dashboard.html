@@ -1,20 +1,21 @@
-<div class="min-h-screen bg-gray-100">
+<div class="min-h-screen bg-teal-50">
   <!-- Sidebar with open binding -->
   <app-sidebar [open]="sidebarOpen" (closeSidebar)="toggleSidebar()"></app-sidebar>
 
   <!-- Main content - margin left only on lg screens where sidebar is always visible -->
   <div class="p-4 lg:p-6 lg:ml-[260px]">
     <!-- Header -->
-    <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 lg:mb-8 gap-4">
+    <div
+      class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 lg:mb-8 gap-4"
+    >
       <div class="flex items-center gap-3">
         <!-- Toggle button for mobile - visible on screens smaller than lg -->
         <button
           (click)="toggleSidebar()"
           type="button"
-          class="inline-flex items-center justify-center p-2 bg-gray-800 text-white rounded-md hover:bg-gray-700 lg:hidden">
-          <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16"></path>
-          </svg>
+          class="inline-flex items-center justify-center p-2 bg-teal-700 text-white rounded-md hover:bg-teal-800 lg:hidden"
+        >
+          <span class="material-icons text-white text-lg">menu</span>
         </button>
         <h1 class="text-xl sm:text-2xl lg:text-3xl font-bold text-gray-900">Stock Mouvements</h1>
       </div>
@@ -22,10 +23,8 @@
 
     <!-- Stats -->
     <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 lg:gap-6 mb-6 lg:mb-8">
-      <app-stat-card
-        title="Total Mouvements"
-        [value]="totalElements"
-        icon="📦">
+      <app-stat-card title="Total Mouvements" [value]="totalElements">
+        <span class="material-icons text-white text-xs">conveyor_belt</span>
       </app-stat-card>
     </div>
 
@@ -37,11 +36,13 @@
           [(ngModel)]="filter.reference"
           placeholder="Référence"
           (input)="onFilterChange()"
-          class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm lg:text-base">
+          class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-teal-500 text-sm lg:text-base"
+        />
         <select
           [(ngModel)]="filter.type"
           (change)="onFilterChange()"
-          class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm lg:text-base">
+          class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-teal-500 text-sm lg:text-base"
+        >
           <option value="">Tous les types</option>
           <option value="ENTREE">Entrée</option>
           <option value="SORTIE">Sortie</option>
@@ -50,77 +51,72 @@
           [(ngModel)]="filter.numeroLot"
           placeholder="Numéro de lot"
           (input)="onFilterChange()"
-          class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm lg:text-base sm:col-span-2 lg:col-span-1">
+          class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-teal-500 text-sm lg:text-base sm:col-span-2 lg:col-span-1"
+        />
       </div>
     </div>
 
     <!-- Error message -->
-    <app-error-message 
-      [error]="error" 
-      (retry)="loadMouvements()">
-    </app-error-message>
+    <app-error-message [error]="error" (retry)="loadMouvements()"> </app-error-message>
 
     <!-- Loading -->
     @if (loading) {
-      <div class="flex justify-center items-center py-8 lg:py-12">
-        <div class="animate-spin rounded-full h-6 w-6 lg:h-8 lg:w-8 border-b-2 border-blue-600"></div>
-        <span class="ml-3 text-base lg:text-lg text-gray-600">Chargement...</span>
-      </div>
+    <div class="flex justify-center items-center py-8 lg:py-12">
+      <div
+        class="animate-spin rounded-full h-6 w-6 lg:h-8 lg:w-8 border-b-2 border-teal-600"
+      ></div>
+      <span class="ml-3 text-base lg:text-lg text-gray-600">Chargement...</span>
+    </div>
     }
 
     <!-- Table for desktop only (lg and above) -->
     @if (!loading) {
-      <div class="hidden lg:block">
-        <app-table
-          [columns]="columns"
-          [data]="mouvements"
-          [loading]="loading"
-          emptyMessage="Aucun mouvement trouvé">
-        </app-table>
-      </div>
+    <div class="hidden lg:block">
+      <app-table
+        [columns]="columns"
+        [data]="mouvements"
+        [loading]="loading"
+        emptyMessage="Aucun mouvement trouvé"
+      >
+      </app-table>
+    </div>
     }
 
     <!-- Cards for mobile and tablet (below lg) -->
     @if (!loading && mouvements.length > 0) {
-      <div class="block lg:hidden space-y-3">
-        @for (mouvement of mouvements; track mouvement.id) {
-          <app-mobile-card
-            [data]="mouvement"
-            [fields]="cardFields"
-            titleField="reference">
-          </app-mobile-card>
-        }
-      </div>
+    <div class="block lg:hidden space-y-3">
+      @for (mouvement of mouvements; track mouvement.id) {
+      <app-mobile-card [data]="mouvement" [fields]="cardFields" titleField="reference">
+      </app-mobile-card>
+      }
+    </div>
     }
 
     <!-- Empty state for mobile -->
     @if (!loading && mouvements.length === 0) {
-      <div class="block lg:hidden text-center py-8 text-gray-500">
-        Aucun mouvement trouvé
-      </div>
+    <div class="block lg:hidden text-center py-8 text-gray-500">Aucun mouvement trouvé</div>
     }
 
     <!-- Pagination -->
-    @if (totalElements > 0) {
-      <div class="flex flex-col sm:flex-row justify-center items-center gap-3 sm:gap-4 mt-6">
-        <button
-          (click)="previousPage()"
-          [disabled]="currentPage === 0"
-          type="button"
-          class="w-full sm:w-auto px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed">
-          Précédent
-        </button>
-        <span class="text-sm text-gray-700 order-first sm:order-none">
-          Page {{ currentPage + 1 }} sur {{ Math.ceil(totalElements / pageSize) }}
-        </span>
-        <button
-          (click)="nextPage()"
-          [disabled]="(currentPage + 1) * pageSize >= totalElements"
-          type="button"
-          class="w-full sm:w-auto px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed">
-          Suivant
-        </button>
-      </div>
-    }
+    <div class="flex flex-col sm:flex-row justify-center items-center gap-3 sm:gap-4 mt-6">
+      <button
+        (click)="previousPage()"
+        [disabled]="currentPage === 0"
+        type="button"
+        class="w-full sm:w-auto px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+      >
+        Précédent
+      </button>
+      <span class="text-sm text-gray-700 order-first sm:order-none">
+        Page {{ currentPage + 1 }} sur {{ Math.ceil(totalElements / pageSize) }}
+      </span>
+      <button
+        (click)="nextPage()"
+        type="button"
+        class="w-full sm:w-auto px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+      >
+        Suivant
+      </button>
+    </div>
   </div>
 </div>

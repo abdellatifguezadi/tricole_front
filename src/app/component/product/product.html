@@ -1,0 +1,65 @@
+
+<div class="min-h-screen bg-teal-50 pt-8 ">
+  <app-sidebar [open]="sidebarOpen" (closeSidebar)="toggleSidebar()"></app-sidebar>
+
+  <div class="p-6 lg:ml-[260px]">
+    <div class="flex items-center justify-between mb-6">
+      <div class="flex items-center gap-3">
+        <button
+          (click)="toggleSidebar()"
+          type="button"
+          class="inline-flex items-center justify-center p-2 bg-teal-700 text-white rounded-md hover:bg-teal-800 lg:hidden"
+        >
+          <span class="material-icons text-white text-lg">menu</span>
+        </button>
+        <h1 class="text-2xl font-bold text-gray-800">Gestion des Fournisseurs</h1>
+      </div>
+      <button class="bg-teal-700 text-white px-4 py-2 rounded-lg hover:bg-teal-800">
+        Ajouter produit
+      </button>
+    </div>
+
+    <app-error-message [error]="error" (retry)="loadProducts()"> </app-error-message>
+
+    <!-- Loading state -->
+    @if (loading) {
+      <div class="flex justify-center items-center py-8">
+        <div class="animate-spin rounded-full h-6 w-6 border-b-2 border-teal-600"></div>
+        <span class="ml-3 text-gray-600">Chargement...</span>
+      </div>
+    }
+
+    @if (!loading) {
+      <div class="hidden lg:block">
+        <app-table
+          [columns]="columns"
+          [data]="products"
+          [actions]="actions"
+          [loading]="loading"
+          emptyMessage="Aucun produit trouvé"
+          (actionClick)="onTableAction($event.action, $event.item)"
+        >
+        </app-table>
+      </div>
+    }
+
+    @if (!loading && products.length > 0) {
+      <div class="block lg:hidden space-y-3">
+        @for (p of products; track p.id) {
+          <app-mobile-card
+            [data]="p"
+            [fields]="cardFields"
+            titleField="raisonSociale"
+            [actions]="actions"
+            [onAction]="onTableAction"
+          >
+          </app-mobile-card>
+        }
+      </div>
+    }
+
+    @if (!loading && products.length === 0) {
+      <div class="block lg:hidden text-center py-8 text-gray-500">Aucun fournisseur trouvé</div>
+    }
+  </div>
+</div>

@@ -1,13 +1,28 @@
-<div class="bg-white border border-gray-200 rounded-lg p-4 hover:shadow-md transition-all duration-300">
+<div
+  class="bg-white border border-gray-200 rounded-lg p-4 hover:shadow-md transition-all duration-300"
+>
   <div class="border-b border-gray-100 pb-3 mb-4">
-    <h3 class="text-base font-bold text-gray-800">{{title}}</h3>
+    <h3 class="text-base font-bold text-gray-800">{{ title }}</h3>
   </div>
-  <div class="space-y-3">
-    @for (item of dataArray ; track  item.key){
-      <div  class="flex justify-between items-center py-1 border-b border-gray-50 last:border-b-0">
-        <span class="text-xs font-medium text-gray-700">{{item.key}}</span>
-        <span class="text-xs font-bold text-black bg-gray-100 px-2 py-1 rounded-full">{{item.value}}</span>
-      </div>
+
+  <!-- Chart.js Canvas -->
+  <div class="h-48 mb-4">
+    <canvas baseChart
+      [data]="chartData"
+      [type]="chartType"
+      [options]="chartOptions">
+    </canvas>
+  </div>
+
+  <!-- Liste des valeurs -->
+  <div class="space-y-2 max-h-32 overflow-y-auto">
+    @for (item of dataArray ; track item.key){
+    <div class="flex justify-between items-center py-1 border-b border-gray-50 last:border-b-0">
+      <span class="text-xs font-medium text-gray-700">{{ item.key }}</span>
+      <span class="text-xs font-bold text-teal-800 bg-teal-50 px-2 py-1 rounded-full">{{
+        item.value
+      }}</span>
+    </div>
     }
   </div>
 </div>

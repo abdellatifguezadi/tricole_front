@@ -1,54 +1,51 @@
 @if (loading) {
-  <div class="flex justify-center items-center h-32">
-    <div class="w-8 h-8 border-4 border-gray-800 border-t-transparent rounded-full animate-spin"></div>
-  </div>
-}
-
-@if (!loading && data.length > 0) {
-  <div class="bg-white rounded-lg shadow overflow-x-auto">
-    <table class="min-w-full text-sm md:text-base">
-      <thead class="bg-gray-50">
-        <tr>
-          @for (column of columns; track column.key) {
-            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-              {{column.label}}
-            </th>
-          }
-          @if (actions.length > 0) {
-            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-              Actions
-            </th>
-          }
-        </tr>
-      </thead>
-      <tbody class="bg-white divide-y divide-gray-200">
-        @for (item of data; track item.id) {
-          <tr class="hover:bg-gray-50">
-            @for (column of columns; track column.key) {
-              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                {{ getValue(item, column) || '-' }}
-              </td>
-            }
-            @if (actions.length > 0) {
-              <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                @for (action of actions; track action.action) {
-                  <button
-                    (click)="onAction(action.action, item)"
-                    [class]="action.class || 'text-gray-600 hover:text-gray-900 mr-3'">
-                    {{action.label}}
-                  </button>
-                }
-              </td>
-            }
-          </tr>
+<div class="flex justify-center items-center h-32">
+  <div
+    class="w-8 h-8 border-4 border-teal-700 border-t-transparent rounded-full animate-spin"
+  ></div>
+</div>
+} @if (!loading && data.length > 0) {
+<div class="bg-white rounded-lg shadow overflow-x-auto">
+  <table class="min-w-full text-sm md:text-base">
+    <thead class="bg-gray-50">
+      <tr>
+        @for (column of columns; track column.key) {
+        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+          {{ column.label }}
+        </th>
+        } @if (actions.length > 0) {
+        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+          Actions
+        </th>
         }
-      </tbody>
-    </table>
-  </div>
-}
-
-@if (!loading && data.length === 0) {
-  <div class="text-center py-12">
-    <div class="text-gray-500 text-lg">{{emptyMessage}}</div>
-  </div>
+      </tr>
+    </thead>
+    <tbody class="bg-white divide-y divide-gray-200">
+      @for (item of data; track item.id) {
+      <tr class="hover:bg-gray-50">
+        @for (column of columns; track column.key) {
+        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+          {{ getValue(item, column) || '-' }}
+        </td>
+        } @if (actions.length > 0) {
+        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+          @for (action of actions; track action.action) {
+          <button
+            (click)="onAction(action.action, item)"
+            [class]="action.class || 'text-gray-600 hover:text-gray-900 mr-3'"
+          >
+            {{ action.label }}
+          </button>
+          }
+        </td>
+        }
+      </tr>
+      }
+    </tbody>
+  </table>
+</div>
+} @if (!loading && data.length === 0) {
+<div class="text-center py-12">
+  <div class="text-gray-500 text-lg">{{ emptyMessage }}</div>
+</div>
 }
