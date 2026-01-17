@@ -1,9 +1,9 @@
 import {Component, signal, WritableSignal, OnInit} from '@angular/core';
 import {ProductResponse} from '../../models/Product/productResponse';
-import { Table, TableColumn, TableAction } from '../table/table';
+import { Table, TableColumn, TableAction } from '../shared/table/table';
 import {CommonModule} from '@angular/common';
 import {Sidebar} from '../sidebar/sidebar';
-import {MobileCard} from '../mobile-card/mobile-card';
+import {MobileCard} from '../shared/mobile-card/mobile-card';
 import {ErrorMessage} from '../error-message/error-message';
 import {ProductService} from '../../services/product/product-service';
 import {ProductForm} from './product-form/product-form';

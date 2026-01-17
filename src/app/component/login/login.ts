@@ -4,7 +4,7 @@ import { CommonModule } from '@angular/common';
 import { Auth } from '../../services/authService/auth';
 import { Router } from '@angular/router';
 import { catchError, finalize, tap, of } from 'rxjs';
-import { InputField } from '../input-field/input-field';
+import { InputField } from '../shared/input-field/input-field';
 
 @Component({
   selector: 'app-login',

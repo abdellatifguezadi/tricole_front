@@ -7,9 +7,9 @@ import  {MouvementStock} from '../../../models/mouvment/mouvmentStock';
 import  {MouvementFilter} from '../../../models/mouvment/mouvmentFilter';
 import { StatCard } from '../../dashboard-components';
 import { Auth } from '../../../services/authService/auth';
-import {Table, TableColumn} from '../../table/table';
+import {Table, TableColumn} from '../../shared/table/table';
 import {Sidebar} from '../../sidebar/sidebar';
-import { MobileCard } from '../../mobile-card/mobile-card';
+import { MobileCard } from '../../shared/mobile-card/mobile-card';
 import { ErrorMessage } from '../../error-message/error-message';
 
 @Component({

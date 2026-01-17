@@ -1,0 +1,82 @@
+<app-modal-form
+  title="Ajouter un Bon de Sortie"
+  [form]="bonSortieForm"
+  [isLoading]="isLoading()"
+  [errorMessage]="errorMessage()"
+  submitLabel="Créer"
+  (closeModal)="onCancel()"
+  (submitForm)="onSubmit()">
+
+  <ng-template #formContent>
+    <div [formGroup]="bonSortieForm">
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+        <app-input-field
+          label="Date de Sortie"
+          type="date"
+          formControlName="dateSortie"
+          [error]="getFieldError('dateSortie', 'Date requise')">
+        </app-input-field>
+
+        <app-select-field
+          label="Motif"
+          placeholder="Sélectionner un motif"
+          [options]="motifOptions"
+          formControlName="motif"
+          [error]="getFieldError('motif', 'Motif requis')">
+        </app-select-field>
+
+        <app-select-field
+          label="Atelier"
+          placeholder="Sélectionner un atelier"
+          [options]="atelierOptions"
+          formControlName="atelier"
+          [error]="getFieldError('atelier', 'Atelier requis')">
+        </app-select-field>
+      </div>
+
+      <div class="border-t pt-4">
+        <div class="flex justify-between items-center mb-4">
+          <h3 class="text-lg font-semibold text-gray-800">Produits à sortir</h3>
+          <button
+            type="button"
+            (click)="addLigne()"
+            class="px-3 py-1 bg-teal-600 text-white rounded-md hover:bg-teal-700 text-sm">
+            + Ajouter produit
+          </button>
+        </div>
+
+        <div formArrayName="ligneBonSorties" class="space-y-3">
+          @for (ligne of lignes.controls; track $index; let i = $index) {
+            <div [formGroupName]="i" class="flex gap-3 items-end p-3 bg-gray-50 rounded-lg">
+              <div class="flex-1">
+                <app-select-field
+                  label="Produit"
+                  placeholder="Sélectionner un produit"
+                  [options]="produitOptions()"
+                  formControlName="produitId">
+                </app-select-field>
+              </div>
+
+              <div class="w-32">
+                <app-input-field
+                  label="Quantité"
+                  type="number"
+                  formControlName="quantite"
+                  placeholder="1">
+                </app-input-field>
+              </div>
+
+              <button
+                type="button"
+                (click)="removeLigne(i)"
+                [disabled]="lignes.length === 1"
+                class="px-3 py-2 text-red-600 hover:text-red-800 disabled:text-gray-400 mb-4">
+                🗑️
+              </button>
+            </div>
+          }
+        </div>
+      </div>
+    </div>
+  </ng-template>
+</app-modal-form>

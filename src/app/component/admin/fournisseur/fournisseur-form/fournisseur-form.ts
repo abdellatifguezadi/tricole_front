@@ -3,7 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { FournisseurService } from '../../../../services/fournisseur/fournisseur-service';
 import { FournisseurRequest } from '../../../../models/fournisseur';
-import { InputField } from '../../../input-field/input-field';
+import { InputField } from '../../../shared/input-field/input-field';
 import { ModalForm } from '../../../shared/modal-form/modal-form';
 import {catchError, tap} from 'rxjs/operators';
 import {EMPTY, finalize} from 'rxjs';

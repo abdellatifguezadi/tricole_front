@@ -1,0 +1,92 @@
+<div class="min-h-screen bg-teal-50 pt-8">
+  <app-sidebar [open]="sidebarOpen()" (closeSidebar)="toggleSidebar()"></app-sidebar>
+
+  <div class="p-6 lg:ml-[260px]">
+    <div class="flex items-center justify-between mb-6">
+      <div class="flex items-center gap-3">
+        <button
+          (click)="toggleSidebar()"
+          type="button"
+          class="inline-flex items-center justify-center p-2 bg-teal-700 text-white rounded-md hover:bg-teal-800 lg:hidden"
+        >
+          <span class="material-icons text-white text-lg">menu</span>
+        </button>
+        <h1 class="text-2xl font-bold text-gray-800">Commandes</h1>
+      </div>
+      <button
+        (click)="openForm()"
+        class="px-4 py-2 bg-teal-600 text-white rounded-lg hover:bg-teal-700 transition-colors">
+        + Ajouter
+      </button>
+    </div>
+
+    @if (error()) {
+      <app-error-message [error]="error()" (retry)="retryLoad()"></app-error-message>
+    }
+
+    @if (loading()) {
+      <div class="flex justify-center items-center py-8">
+        <div class="animate-spin rounded-full h-6 w-6 border-b-2 border-teal-600"></div>
+        <span class="ml-3 text-gray-600">Chargement des commandes...</span>
+      </div>
+    }
+
+    @if (!loading()) {
+      <div class="hidden lg:block">
+        <app-table
+          [data]="commandes()"
+          [columns]="columns"
+          [actions]="actions"
+          [loading]="loading()"
+          emptyMessage="Aucune commande trouvée"
+          (actionClick)="onTableAction($event.action, $event.item)">
+        </app-table>
+      </div>
+    }
+
+    @if (!loading() && commandes().length > 0) {
+      <div class="block lg:hidden space-y-3">
+        @for (commande of commandes(); track commande.id) {
+          <app-mobile-card
+            [data]="commande"
+            [fields]="cardFields"
+            titleField="numeroCommande"
+            [actions]="actions"
+            (actionClick)="onTableAction($event.action, $event.item)">
+          </app-mobile-card>
+        }
+      </div>
+    }
+
+    @if (!loading() && commandes().length === 0) {
+      <div class="block lg:hidden text-center py-8 text-gray-500">Aucune commande trouvée</div>
+    }
+  </div>
+
+  <app-details-modal
+    [isOpen]="showDetails()"
+    title="Détails de la Commande"
+    (close)="closeDetails()">
+
+    @if (selectedCommande()) {
+      <app-info-card
+        [data]="selectedCommande()"
+        [sections]="getCommandeInfoSections()">
+      </app-info-card>
+
+      <app-product-lines
+        [lines]="selectedCommande()?.lignesCommande || []"
+        [montantTotal]="selectedCommande()?.montantTotal"
+        title="Produits Commandés"
+        [showPricing]="true">
+      </app-product-lines>
+    }
+  </app-details-modal>
+
+  @if (showForm()) {
+    <app-commande-form
+      (closeForm)="closeForm()"
+      (commandeAdded)="onCommandeAdded()">
+    </app-commande-form>
+  }
+</div>

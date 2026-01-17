@@ -4,6 +4,8 @@ import { DashboardService } from '../../../services/dashboard/dashboard.service'
 import { DashboardStats } from '../../../models';
 import {AlertCard, ChartCard, StatCard} from '../../dashboard-components';
 import { ErrorMessage } from '../../error-message/error-message';
+import {EMPTY, finalize, of} from 'rxjs';
+import {catchError, tap} from 'rxjs/operators';
 
 
 @Component({
@@ -29,6 +31,7 @@ export class AdminDashboard implements OnInit {
     this.loadStats();
   }
 
+  /**
   loadStats() {
     this.error = '';
     this.dashboardService.getDashboardStats().subscribe({
@@ -40,8 +43,26 @@ export class AdminDashboard implements OnInit {
         if (error.status !== 401 && error.status !== 403) {
           this.error = 'Erreur lors du chargement des statistiques. Veuillez réessayer.';
         }
+
       }
     });
+  }
+   **/
+
+  loadStats(){
+    this.error = '';
+
+    this.dashboardService.getDashboardStats().pipe(
+    tap((data) => {
+        this.stats = data;
+    }),
+    catchError(error => {
+        if (error.status !== 401 && error.status !== 403) {
+          this.error = 'Erreur lors du chargement des statistiques. Veuillez réessayer.';
+        }
+      return EMPTY;
+    })
+    ).subscribe();
   }
 
 

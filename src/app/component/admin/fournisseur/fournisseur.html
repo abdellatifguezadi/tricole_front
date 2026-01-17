@@ -50,7 +50,7 @@
         [fields]="cardFields"
         titleField="raisonSociale"
         [actions]="actions"
-        [onAction]="onTableAction"
+        (actionClick)="onTableAction($event.action, $event.item)"
       >
       </app-mobile-card>
       }

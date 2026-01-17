@@ -3,6 +3,8 @@ import { Login } from './component/login/login';
 import { Register } from './component/register/register';
 import { AdminDashboard } from './component/admin/admin-dashboard/admin-dashboard';
 import { FournisseurComponent } from './component/admin/fournisseur/fournisseur';
+import { BonSortieComponent } from './component/admin/bon-sortie/bon-sortie';
+import { CommandeComponent } from './component/admin/commande/commande';
 import { authGuard, loginGuard } from './guards/auth.guard';
 import { permissionGuard } from './guards/permission.guard';
 import { MagasinierDashboard } from './component/magasinier/magasinier-dashboard/magasinier-dashboard';
@@ -43,5 +45,15 @@ export const routes: Routes = [
     path: 'product',
     component: Product,
     canActivate: [authGuard, permissionGuard(['PRODUIT_READ'])]
+  },
+  {
+    path: 'bons-sortie',
+    component: BonSortieComponent,
+    canActivate: [authGuard, permissionGuard(['STOCK_READ'])]
+  },
+  {
+    path: 'commandes',
+    component: CommandeComponent,
+    canActivate: [authGuard, permissionGuard(['COMMANDE_READ'])]
   }
 ];

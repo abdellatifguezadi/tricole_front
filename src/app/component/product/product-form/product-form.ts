@@ -4,7 +4,7 @@ import {ProductService} from '../../../services/product/product-service';
 import {ProductRequest} from '../../../models/Product/productResponse';
 import {catchError, tap} from 'rxjs/operators'
 import {EMPTY, finalize} from 'rxjs';
-import {InputField} from '../../input-field/input-field';
+import {InputField} from '../../shared/input-field/input-field';
 import {ModalForm} from '../../shared/modal-form/modal-form';
 import {CommonModule} from '@angular/common';
 
@@ -110,17 +110,30 @@ export class ProductForm{
           this.closeForm.emit();
       }),
       catchError((err) => {
-        console.error(err.error);
+        console.error('Error details:', err);
 
-        let myError = 'Erreur inattendue';
+        const errorMessages: string[] = [];
 
-        if(err.error) {
-          const myErr = Object.values(err.error)[0];
-          myError = typeof myErr === 'string' ? myErr : 'Erreur inattendue';
+        if (err.error && typeof err.error === 'object') {
+          // Handle specific field errors
+          if (typeof err.error.reference === 'string') errorMessages.push(err.error.reference);
+          if (typeof err.error.nom === 'string') errorMessages.push(err.error.nom);
+          if (typeof err.error.description === 'string') errorMessages.push(err.error.description);
+          if (typeof err.error.stockActuel === 'string') errorMessages.push(err.error.stockActuel);
+          if (typeof err.error.pointCommande === 'string') errorMessages.push(err.error.pointCommande);
+          if (typeof err.error.uniteMesure === 'string') errorMessages.push(err.error.uniteMesure);
+          if (typeof err.error.categorie === 'string') errorMessages.push(err.error.categorie);
+
+          // Handle general error messages
+          if (typeof err.error.message === 'string') errorMessages.push(err.error.message);
+          if (typeof err.error.error === 'string') errorMessages.push(err.error.error);
         }
 
-        this.errorMessage.set(myError);
+        const finalError = errorMessages.length > 0
+          ? errorMessages.join(', ')
+          : 'Erreur inattendue';
 
+        this.errorMessage.set(finalError);
         return EMPTY;
 
       }),

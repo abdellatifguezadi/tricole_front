@@ -3,7 +3,7 @@ import {CommonModule} from '@angular/common';
 import {FormBuilder, ReactiveFormsModule, Validators} from '@angular/forms';
 import {Auth} from '../../services/authService/auth';
 import {Router} from '@angular/router';
-import { InputField } from '../input-field/input-field';
+import { InputField } from '../shared/input-field/input-field';
 import {catchError, tap} from 'rxjs/operators';
 import {finalize, of} from 'rxjs';
 

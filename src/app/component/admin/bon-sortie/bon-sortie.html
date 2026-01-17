@@ -1,0 +1,92 @@
+<div class="min-h-screen bg-teal-50 pt-8">
+  <app-sidebar [open]="sidebarOpen()" (closeSidebar)="toggleSidebar()"></app-sidebar>
+
+  <div class="p-6 lg:ml-[260px]">
+    <div class="flex items-center justify-between mb-6">
+      <div class="flex items-center gap-3">
+        <button
+          (click)="toggleSidebar()"
+          type="button"
+          class="inline-flex items-center justify-center p-2 bg-teal-700 text-white rounded-md hover:bg-teal-800 lg:hidden"
+        >
+          <span class="material-icons text-white text-lg">menu</span>
+        </button>
+        <h1 class="text-2xl font-bold text-gray-800">Bons de Sortie</h1>
+      </div>
+      <button
+        (click)="openForm()"
+        class="px-4 py-2 bg-teal-600 text-white rounded-lg hover:bg-teal-700 transition-colors">
+        + Ajouter
+      </button>
+    </div>
+
+    @if (error()) {
+      <app-error-message [error]="error()" (retry)="retryLoad()"></app-error-message>
+    }
+
+    @if (loading()) {
+      <div class="flex justify-center items-center py-8">
+        <div class="animate-spin rounded-full h-6 w-6 border-b-2 border-teal-600"></div>
+        <span class="ml-3 text-gray-600">Chargement des bons de sortie...</span>
+      </div>
+    }
+
+    @if (!loading()) {
+      <div class="hidden lg:block">
+        <app-table
+          [data]="bonSorties()"
+          [columns]="columns"
+          [actions]="actions"
+          [loading]="loading()"
+          emptyMessage="Aucun bon de sortie trouvé"
+          (actionClick)="onTableAction($event.action, $event.item)">
+        </app-table>
+      </div>
+    }
+
+    @if (!loading() && bonSorties().length > 0) {
+      <div class="block lg:hidden space-y-3">
+        @for (bonSortie of bonSorties(); track bonSortie.id) {
+          <app-mobile-card
+            [data]="bonSortie"
+            [fields]="cardFields"
+            titleField="numeroBon"
+            [actions]="actions"
+            (actionClick)="onTableAction($event.action, $event.item)">
+          </app-mobile-card>
+        }
+      </div>
+    }
+
+    @if (!loading() && bonSorties().length === 0) {
+      <div class="block lg:hidden text-center py-8 text-gray-500">Aucun bon de sortie trouvé</div>
+    }
+  </div>
+
+  <app-details-modal
+    [isOpen]="showDetails()"
+    title="Détails du Bon de Sortie"
+    (close)="closeDetails()">
+
+    @if (selectedBonSortie()) {
+      <app-info-card
+        [data]="selectedBonSortie()"
+        [sections]="getBonSortieInfoSections()">
+      </app-info-card>
+
+      <app-product-lines
+        [lines]="selectedBonSortie()?.ligneBonSorties || []"
+        [montantTotal]="selectedBonSortie()?.montantTotal"
+        title="Produits Sortis"
+        [showPricing]="false">
+      </app-product-lines>
+    }
+  </app-details-modal>
+
+  @if (showForm()) {
+    <app-bon-sortie-form
+      (closeForm)="closeForm()"
+      (bonSortieAdded)="onBonSortieAdded()">
+    </app-bon-sortie-form>
+  }
+</div>

@@ -1,0 +1,84 @@
+<app-modal-form
+  title="Ajouter une Commande"
+  [form]="commandeForm"
+  [isLoading]="isLoading()"
+  [errorMessage]="errorMessage()"
+  submitLabel="Créer"
+  (closeModal)="onCancel()"
+  (submitForm)="onSubmit()">
+
+  <ng-template #formContent>
+    <div [formGroup]="commandeForm">
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+        <app-select-field
+          label="Fournisseur"
+          placeholder="Sélectionner un fournisseur"
+          [options]="fournisseurOptions()"
+          formControlName="fournisseurId"
+          [error]="getFieldError('fournisseurId', 'Fournisseur requis')">
+        </app-select-field>
+
+        <app-input-field
+          label="Date de Livraison Prévue"
+          type="date"
+          formControlName="dateLivraisonPrevue"
+          [error]="getFieldError('dateLivraisonPrevue', 'Date requise')">
+        </app-input-field>
+      </div>
+
+      <div class="border-t pt-4">
+        <div class="flex justify-between items-center mb-4">
+          <h3 class="text-lg font-semibold text-gray-800">Produits à commander</h3>
+          <button
+            type="button"
+            (click)="addLigne()"
+            class="px-3 py-1 bg-teal-600 text-white rounded-md hover:bg-teal-700 text-sm">
+            + Ajouter produit
+          </button>
+        </div>
+
+        <div formArrayName="lignes" class="space-y-3">
+          @for (ligne of lignes.controls; track $index; let i = $index) {
+            <div [formGroupName]="i" class="flex gap-3 items-end p-3 bg-gray-50 rounded-lg">
+              <div class="flex-1">
+                <app-select-field
+                  label="Produit"
+                  placeholder="Sélectionner un produit"
+                  [options]="produitOptions()"
+                  formControlName="produitId">
+                </app-select-field>
+              </div>
+
+              <div class="w-28">
+                <app-input-field
+                  label="Quantité"
+                  type="number"
+                  formControlName="quantite"
+                  placeholder="1">
+                </app-input-field>
+              </div>
+
+              <div class="w-32">
+                <app-input-field
+                  label="Prix (DH)"
+                  type="number"
+                  formControlName="prixUnitaire"
+                  placeholder="0">
+                </app-input-field>
+              </div>
+
+              <button
+                type="button"
+                (click)="removeLigne(i)"
+                [disabled]="lignes.length === 1"
+                class="px-3 py-2 text-red-600 hover:text-red-800 disabled:text-gray-400 mb-4">
+                🗑️
+              </button>
+            </div>
+          }
+        </div>
+      </div>
+    </div>
+  </ng-template>
+</app-modal-form>
+

@@ -1,0 +1,30 @@
+<div>
+  @for (section of sections; track section.title) {
+    <div class="rounded-lg p-4 mb-6" [class]="section.bgClass">
+      @if (section.title) {
+        <h3 class="text-lg font-bold text-gray-800 mb-3">{{ section.title }}</h3>
+      }
+
+      <div class="grid gap-4" [class]="getGridClass(section.columns || 2)">
+        @for (field of section.fields; track field.key) {
+          <div>
+            <p class="text-sm font-medium text-gray-500">{{ field.label }}</p>
+            @if (field.type === 'badge') {
+              <p class="text-lg font-semibold">
+                <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium"
+                      [class]="field.badgeClass || 'bg-gray-100 text-gray-800'">
+                  {{ formatValue(field) }}
+                </span>
+              </p>
+            } @else if (field.type === 'currency') {
+              <p class="text-lg font-semibold text-green-600">{{ formatValue(field) }}</p>
+            } @else {
+              <p class="text-lg font-semibold">{{ formatValue(field) }}</p>
+            }
+          </div>
+        }
+      </div>
+    </div>
+  }
+</div>
+

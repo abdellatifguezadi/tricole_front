@@ -14,7 +14,7 @@
           {{ column.label }}
         </th>
         } @if (actions.length > 0) {
-        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+        <th class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
           Actions
         </th>
         }
@@ -28,15 +28,19 @@
           {{ getValue(item, column) || '-' }}
         </td>
         } @if (actions.length > 0) {
-        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
-          @for (action of actions; track action.action) {
-          <button
-            (click)="onAction(action.action, item)"
-            [class]="action.class || 'text-gray-600 hover:text-gray-900 mr-3'"
-          >
-            {{ action.label }}
-          </button>
-          }
+        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-center">
+          <div class="flex justify-center gap-2">
+            @for (action of actions; track action.action) {
+              @if (shouldShowAction(action, item)) {
+                <button
+                  (click)="onAction(action.action, item)"
+                  [class]="action.class || 'text-gray-600 hover:text-gray-900'"
+                >
+                  {{ action.label }}
+                </button>
+              }
+            }
+          </div>
         </td>
         }
       </tr>
@@ -49,3 +53,4 @@
   <div class="text-gray-500 text-lg">{{ emptyMessage }}</div>
 </div>
 }
+

@@ -4,13 +4,14 @@ import { CommonModule } from '@angular/common';
 export interface TableColumn {
   key: string;
   label: string;
-  type?: 'text' | 'email' | 'date' | 'number';
+  type?: 'text' | 'email' | 'date' | 'number' | 'currency' | 'datetime';
 }
 
 export interface TableAction {
   label: string;
   action: string;
   class?: string;
+  showIf?: (item: any) => boolean;
 }
 
 @Component({
@@ -32,10 +33,26 @@ export class Table {
     this.actionClick.emit({action, item});
   }
 
+  shouldShowAction(action: TableAction, item: any): boolean {
+    return action.showIf ? action.showIf(item) : true;
+  }
+
   getValue(item: any, column: any) {
-    const value = item[column.key];
+    const keys = column.key.split('.');
+    let value = item;
+
+    for (const key of keys) {
+      value = value?.[key];
+    }
+
     if (column.type === 'date' && value) {
       return new Date(value).toLocaleDateString('fr-FR');
+    }
+    if (column.type === 'datetime' && value) {
+      return new Date(value).toLocaleDateString('fr-FR') + ' ' + new Date(value).toLocaleTimeString('fr-FR');
+    }
+    if (column.type === 'currency' && value) {
+      return `${value} DH`;
     }
     return value;
   }
