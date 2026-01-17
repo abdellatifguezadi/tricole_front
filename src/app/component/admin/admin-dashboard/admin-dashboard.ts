@@ -3,7 +3,6 @@ import { Sidebar } from '../../sidebar/sidebar';
 import { DashboardService } from '../../../services/dashboard/dashboard.service';
 import { DashboardStats } from '../../../models';
 import {AlertCard, ChartCard, StatCard} from '../../dashboard-components';
-import { Router } from '@angular/router';
 import { ErrorMessage } from '../../error-message/error-message';
 
 
@@ -24,7 +23,7 @@ export class AdminDashboard implements OnInit {
   error = '';
   sidebarOpen = false;
 
-  constructor(private dashboardService: DashboardService, private router: Router) {}
+  constructor(private dashboardService: DashboardService) {}
 
   ngOnInit() {
     this.loadStats();
@@ -38,10 +37,8 @@ export class AdminDashboard implements OnInit {
       },
       error: (error) => {
         console.error('Erreur lors du chargement des statistiques:', error);
-        this.error = 'Erreur lors du chargement des statistiques. Veuillez réessayer.';
-        if (error.status === 401) {
-          console.log('Utilisateur non authentifié, redirection vers login...');
-          this.router.navigate(['/login']);
+        if (error.status !== 401 && error.status !== 403) {
+          this.error = 'Erreur lors du chargement des statistiques. Veuillez réessayer.';
         }
       }
     });

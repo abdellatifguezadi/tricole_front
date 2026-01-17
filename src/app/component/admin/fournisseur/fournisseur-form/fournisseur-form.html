@@ -1,0 +1,35 @@
+<app-modal-form
+  title="Ajouter un Fournisseur"
+  [form]="fournisseurForm"
+  [isLoading]="isLoading()"
+  [errorMessage]="errorMessage()"
+  submitLabel="Ajouter"
+  (closeModal)="onCancel()"
+  (submitForm)="onSubmit()">
+
+  <ng-template #formContent>
+    <div [formGroup]="fournisseurForm">
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        @for (field of formFields; track field.name) {
+          <app-input-field
+            [label]="field.label"
+            [type]="field.type"
+            [placeholder]="field.placeholder"
+            [formControlName]="field.name"
+            [error]="getFieldError(field.name, field.errorMessage)">
+          </app-input-field>
+        }
+      </div>
+
+      <div class="mt-4">
+        <app-input-field
+          [label]="adresseField.label"
+          [type]="adresseField.type"
+          [placeholder]="adresseField.placeholder"
+          [formControlName]="adresseField.name"
+          [error]="getFieldError(adresseField.name, adresseField.errorMessage)">
+        </app-input-field>
+      </div>
+    </div>
+  </ng-template>
+</app-modal-form>

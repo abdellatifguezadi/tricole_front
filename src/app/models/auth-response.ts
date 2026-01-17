@@ -1,4 +1,4 @@
-export interface User {
+export interface AuthResponse {
   userId: number;
   username: string;
   email: string;
@@ -6,3 +6,4 @@ export interface User {
   role: string;
   authorities: string[];
 }
+

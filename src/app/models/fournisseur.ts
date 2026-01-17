@@ -11,3 +11,14 @@ export interface Fournisseur{
   dateCreation : Date,
   dateModification : Date
 }
+
+
+export interface FournisseurRequest{
+  raisonSociale : string,
+  adresse : string,
+  ville : string,
+  personneContact : string,
+  telephone : string,
+  email : string,
+  ice : string
+}

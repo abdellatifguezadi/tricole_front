@@ -1,10 +1,10 @@
-import { Injectable, Inject, PLATFORM_ID } from '@angular/core';
+import { Injectable, Inject, PLATFORM_ID, signal } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { BehaviorSubject, Observable } from 'rxjs';
-import { tap } from 'rxjs/operators';
+import { Observable, of } from 'rxjs';
+import { tap, catchError, map, shareReplay } from 'rxjs/operators';
 import { isPlatformBrowser } from '@angular/common';
 
-import { LoginRequest, LoginResponse , User } from '../../models';
+import { LoginRequest, User, AuthResponse } from '../../models';
 
 @Injectable({
   providedIn: 'root',
@@ -13,20 +13,20 @@ export class Auth {
 
   private apiUrl = 'http://localhost:8080/api/auth';
 
-  private currentUserSubject = new BehaviorSubject<User | null>(null);
-  currentUser$ = this.currentUserSubject.asObservable();
+  private currentUserSignal = signal<User | null>(null);
+  currentUser = this.currentUserSignal.asReadonly();
+
+  private loadingPromise: Observable<User | null> | null = null;
 
   constructor(
     private http: HttpClient,
     @Inject(PLATFORM_ID) private platformId: Object
-  ) {
-    this.loadStoredUser();
-  }
+  ) {}
 
 
-  login(credentials: LoginRequest): Observable<LoginResponse> {
+  login(credentials: LoginRequest): Observable<AuthResponse> {
     return this.http
-      .post<LoginResponse>(
+      .post<AuthResponse>(
         `${this.apiUrl}/login`,
         credentials,
         { withCredentials: true }
@@ -45,49 +45,74 @@ export class Auth {
   }
 
 
-  logout(): void {
-    if (isPlatformBrowser(this.platformId)) {
-      localStorage.clear();
+  logout(): Observable<any> {
+    return this.http.post(
+      `${this.apiUrl}/logout`,
+      {},
+      { withCredentials: true }
+    ).pipe(
+      tap(() => {
+        this.currentUserSignal.set(null);
+      }),
+      catchError(() => {
+        this.currentUserSignal.set(null);
+        return of(null);
+      })
+    );
+  }
+
+
+  loadCurrentUser(): Observable<User | null> {
+    if (!isPlatformBrowser(this.platformId)) {
+      return of(null);
     }
-    this.currentUserSubject.next(null);
-  }
 
-
-  refreshToken(): Observable<LoginResponse> {
-    return this.http
-      .post<LoginResponse>(
-        `${this.apiUrl}/refresh`,
-        {},
-        { withCredentials: true }
-      )
-      .pipe(
-        tap(res => {
-          if (isPlatformBrowser(this.platformId)) {
-            localStorage.setItem('accessToken', res.accessToken);
-          }
-        })
-      );
-  }
-
-  getAccessToken(): string | null {
-    if (isPlatformBrowser(this.platformId)) {
-      return localStorage.getItem('accessToken');
+    if (this.currentUserSignal()) {
+      return of(this.currentUserSignal());
     }
-    return null;
+
+    if (this.loadingPromise) {
+      return this.loadingPromise;
+    }
+
+    this.loadingPromise = this.http.get<AuthResponse>(
+      `${this.apiUrl}/me`,
+      { withCredentials: true }
+    ).pipe(
+      map(res => {
+        const user: User = {
+          userId: res.userId,
+          username: res.username,
+          email: res.email,
+          fullName: res.fullName,
+          role: res.role,
+          authorities: res.authorities
+        };
+        this.currentUserSignal.set(user);
+        this.loadingPromise = null;
+        return user;
+      }),
+      catchError(err => {
+        if (err.status === 401) {
+          this.currentUserSignal.set(null);
+        }
+        this.loadingPromise = null;
+        return of(null);
+      }),
+      shareReplay(1)
+    );
+
+    return this.loadingPromise;
   }
+
+
 
   isAuthenticated(): boolean {
-    return this.currentUserSubject.value !== null;
+    return this.currentUserSignal() !== null;
   }
-
 
   getCurrentUser(): User | null {
-    return this.currentUserSubject.value;
-  }
-
-  hasPermission(authority: string): boolean {
-    const user = this.getCurrentUser();
-    return user?.authorities?.includes(authority) || false;
+    return this.currentUserSignal();
   }
 
   hasAnyPermission(authorities: string[]): boolean {
@@ -96,8 +121,8 @@ export class Auth {
   }
 
   getRoleBasedRoute(): string {
-    const user = this.currentUserSubject.value;
-    if (!user) return '/login';
+    const user = this.currentUserSignal();
+    if (!user?.role) return '/login';
 
     switch (user.role.toLowerCase()) {
       case 'admin':
@@ -114,30 +139,20 @@ export class Auth {
   }
 
 
-  private handleAuthSuccess(res: LoginResponse): void {
+  private handleAuthSuccess(res: AuthResponse): void {
     if (!isPlatformBrowser(this.platformId)) return;
 
     const user: User = {
       userId: res.userId,
       username: res.username,
       email: res.email,
+      fullName: res.fullName,
       role: res.role,
       authorities: res.authorities
     };
 
-    localStorage.setItem('accessToken', res.accessToken);
-    localStorage.setItem('tokenType', res.tokenType);
-    localStorage.setItem('user', JSON.stringify(user));
-
-    this.currentUserSubject.next(user);
-  }
-
-  private loadStoredUser(): void {
-    if (!isPlatformBrowser(this.platformId)) return;
-
-    const user = localStorage.getItem('user');
-    if (user) {
-      this.currentUserSubject.next(JSON.parse(user));
-    }
+    this.currentUserSignal.set(user);
   }
 }
+
+

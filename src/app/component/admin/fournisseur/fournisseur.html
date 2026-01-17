@@ -1,11 +1,10 @@
 
 <div class="min-h-screen bg-teal-50 pt-8 ">
-  <app-sidebar [open]="sidebarOpen" (closeSidebar)="toggleSidebar()"></app-sidebar>
+  <app-sidebar [open]="sidebarOpen()" (closeSidebar)="toggleSidebar()"></app-sidebar>
 
   <div class="p-6 lg:ml-[260px]">
     <div class="flex items-center justify-between mb-6">
       <div class="flex items-center gap-3">
-        <!-- Mobile hamburger -->
         <button
           (click)="toggleSidebar()"
           type="button"
@@ -15,29 +14,27 @@
         </button>
         <h1 class="text-2xl font-bold text-gray-800">Gestion des Fournisseurs</h1>
       </div>
-      <button class="bg-teal-700 text-white px-4 py-2 rounded-lg hover:bg-teal-800">
+      <button (click)="openForm()" class="bg-teal-700 text-white px-4 py-2 rounded-lg hover:bg-teal-800">
         Ajouter Fournisseur
       </button>
     </div>
 
-    <app-error-message [error]="error" (retry)="loadFournisseurs()"> </app-error-message>
+    <app-error-message [error]="error()" (retry)="loadFournisseurs()"> </app-error-message>
 
-    <!-- Loading state -->
-    @if (loading) {
+    @if (loading()) {
     <div class="flex justify-center items-center py-8">
       <div class="animate-spin rounded-full h-6 w-6 border-b-2 border-teal-600"></div>
       <span class="ml-3 text-gray-600">Chargement...</span>
     </div>
     }
 
-    <!-- Table visible on desktop -->
-    @if (!loading) {
+    @if (!loading()) {
     <div class="hidden lg:block">
       <app-table
         [columns]="columns"
-        [data]="fournisseurs"
+        [data]="fournisseurs()"
         [actions]="actions"
-        [loading]="loading"
+        [loading]="loading()"
         emptyMessage="Aucun fournisseur trouvé"
         (actionClick)="onTableAction($event.action, $event.item)"
       >
@@ -45,10 +42,9 @@
     </div>
     }
 
-    <!-- Cards for tablet & mobile -->
-    @if (!loading && fournisseurs.length > 0) {
+    @if (!loading() && fournisseurs().length > 0) {
     <div class="block lg:hidden space-y-3">
-      @for (f of fournisseurs; track f.id) {
+      @for (f of fournisseurs(); track f.id) {
       <app-mobile-card
         [data]="f"
         [fields]="cardFields"
@@ -61,9 +57,15 @@
     </div>
     }
 
-    <!-- Empty state on mobile/tablet -->
-    @if (!loading && fournisseurs.length === 0) {
+    @if (!loading() && fournisseurs().length === 0) {
     <div class="block lg:hidden text-center py-8 text-gray-500">Aucun fournisseur trouvé</div>
     }
   </div>
+
+  @if (showForm()) {
+    <app-fournisseur-form
+      (closeForm)="closeForm()"
+      (fournisseurAdded)="onFournisseurAdded()">
+    </app-fournisseur-form>
+  }
 </div>

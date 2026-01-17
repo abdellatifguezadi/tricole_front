@@ -1,5 +1,7 @@
 import { inject } from '@angular/core';
 import { Router } from '@angular/router';
+import { map, catchError } from 'rxjs/operators';
+import { of } from 'rxjs';
 import { Auth } from '../services/authService/auth';
 
 export const authGuard = () => {
@@ -10,8 +12,23 @@ export const authGuard = () => {
     return true;
   }
 
-  router.navigate(['/login']);
-  return false;
+  return authService.loadCurrentUser().pipe(
+    map(user => {
+      if (user) {
+        return true;
+      }
+      router.navigate(['/unauthorized'], {
+        state: { message: 'Vous devez vous connecter pour accéder à cette page.' }
+      });
+      return false;
+    }),
+    catchError(() => {
+      router.navigate(['/unauthorized'], {
+        state: { message: 'Session invalide. Veuillez vous reconnecter.' }
+      });
+      return of(false);
+    })
+  );
 };
 
 export const loginGuard = () => {
@@ -24,5 +41,17 @@ export const loginGuard = () => {
     return false;
   }
 
-  return true;
+  return authService.loadCurrentUser().pipe(
+    map(user => {
+      if (user) {
+        const roleRoute = authService.getRoleBasedRoute();
+        router.navigate([roleRoute]);
+        return false;
+      }
+      return true;
+    }),
+    catchError(() => {
+      return of(true);
+    })
+  );
 };

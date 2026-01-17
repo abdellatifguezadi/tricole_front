@@ -8,12 +8,20 @@ import { permissionGuard } from './guards/permission.guard';
 import { MagasinierDashboard } from './component/magasinier/magasinier-dashboard/magasinier-dashboard';
 import { Home } from './component/home/home';
 import { Product } from './component/product/product';
+import { UnauthorizedComponent } from './component/error-pages/unauthorized/unauthorized';
+import { ForbiddenComponent } from './component/error-pages/forbidden/forbidden';
 
 export const routes: Routes = [
   { path: '', component: Home },
   { path: 'home', component: Home },
   { path: 'login', component: Login, canActivate: [loginGuard] },
   { path: 'register', component: Register },
+
+  { path: 'unauthorized', component: UnauthorizedComponent },
+  { path: '401', redirectTo: 'unauthorized' },
+  { path: 'forbidden', component: ForbiddenComponent },
+  { path: '403', redirectTo: 'forbidden' },
+
   {
     path: 'admin_dashboard',
     component: AdminDashboard,

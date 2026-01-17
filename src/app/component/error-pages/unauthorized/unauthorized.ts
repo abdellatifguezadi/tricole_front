@@ -1,0 +1,26 @@
+import { Component } from '@angular/core';
+import { Router } from '@angular/router';
+import { CommonModule } from '@angular/common';
+
+@Component({
+  selector: 'app-unauthorized',
+  standalone: true,
+  imports: [CommonModule],
+  templateUrl: './unauthorized.html',
+  styleUrl: './unauthorized.css'
+})
+export class UnauthorizedComponent {
+  errorMessage = '';
+
+  constructor(private router: Router) {
+    this.errorMessage = history.state?.message || '';
+  }
+
+  goToLogin() {
+    this.router.navigate(['/login']);
+  }
+
+  goHome() {
+    this.router.navigate(['/']);
+  }
+}

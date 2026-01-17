@@ -5,7 +5,6 @@
     <h3 class="text-base font-bold text-gray-800">{{ title }}</h3>
   </div>
 
-  <!-- Chart.js Canvas -->
   <div class="h-48 mb-4">
     <canvas baseChart
       [data]="chartData"
@@ -14,7 +13,6 @@
     </canvas>
   </div>
 
-  <!-- Liste des valeurs -->
   <div class="space-y-2 max-h-32 overflow-y-auto">
     @for (item of dataArray ; track item.key){
     <div class="flex justify-between items-center py-1 border-b border-gray-50 last:border-b-0">

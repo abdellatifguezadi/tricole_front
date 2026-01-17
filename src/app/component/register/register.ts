@@ -4,6 +4,8 @@ import {FormBuilder, ReactiveFormsModule, Validators} from '@angular/forms';
 import {Auth} from '../../services/authService/auth';
 import {Router} from '@angular/router';
 import { InputField } from '../input-field/input-field';
+import {catchError, tap} from 'rxjs/operators';
+import {finalize, of} from 'rxjs';
 
 @Component({
   selector: 'app-register',
@@ -27,27 +29,32 @@ export class Register {
     fullName: ['', Validators.required],
   });
 
-  submit(){
+  submit() {
     if (this.registerForm.invalid || this.isLoading()) return;
 
     this.isLoading.set(true);
     this.errorMessage.set('');
 
-    this.authService.register(this.registerForm.getRawValue()).subscribe({
-      next: () => {
-        this.router.navigate(['/login']);
-      },
-      error: (err) => {
-        console.error(err);
-        let message = err.error.error;
+    this.authService.register(this.registerForm.getRawValue()).pipe(
 
+      tap(() => {
+        this.router.navigate(['/login']);
+      }),
+
+      catchError(err => {
+        console.error(err);
+        const message = err?.error?.error ?? 'Erreur inattendue';
         this.errorMessage.set(message);
-      },
-      complete: () => {
+        return of(null);
+      }),
+
+      finalize(() => {
         this.isLoading.set(false);
-      }
-    });
+      })
+
+    ).subscribe();
   }
+
 
   navigateToLogin() {
     this.router.navigate(['/login']);

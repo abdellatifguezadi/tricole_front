@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import {Component, signal, WritableSignal, OnInit} from '@angular/core';
 import {ProductResponse} from '../../models/Product/productResponse';
 import { Table, TableColumn, TableAction } from '../table/table';
 import {CommonModule} from '@angular/common';
@@ -6,19 +6,22 @@ import {Sidebar} from '../sidebar/sidebar';
 import {MobileCard} from '../mobile-card/mobile-card';
 import {ErrorMessage} from '../error-message/error-message';
 import {ProductService} from '../../services/product/product-service';
+import {ProductForm} from './product-form/product-form';
 
 
 @Component({
   selector: 'app-product',
-  imports: [CommonModule, Table, Sidebar, MobileCard, ErrorMessage],
+  imports: [CommonModule, Table, Sidebar, MobileCard, ErrorMessage, ProductForm],
   templateUrl: './product.html',
   styleUrl: './product.css',
 })
-export class Product {
-   products : ProductResponse[] = [] ;
-   loading = false ;
-   error = '';
-   sidebarOpen = false;
+export class Product implements OnInit {
+   products : WritableSignal<ProductResponse[]> = signal<ProductResponse[]>([]);
+  loading = signal(false);
+  error = signal('');
+  sidebarOpen = signal(false);
+
+  showForm = signal(false);
 
   columns: TableColumn[] = [
     {key: 'id', label: 'ID'},
@@ -50,6 +53,8 @@ export class Product {
     {key: 'dateModification', label : 'Date De Modification'}
   ];
 
+
+
   constructor(private productService: ProductService) {}
 
   ngOnInit() {
@@ -57,18 +62,18 @@ export class Product {
   }
 
   loadProducts() {
-    this.loading = true;
-    this.error = '';
+    this.loading.set(true);
+    this.error.set('');
 
     this.productService.getProducts().subscribe({
       next: (data) => {
-        this.products = data;
-        this.loading = false;
+        this.products.set(data);
+        this.loading.set(false);
       },
       error: (err) => {
         console.error(err);
-        this.error = 'Failed to load products.';
-        this.loading = false;
+        this.error.set('Failed to load products.');
+        this.loading.set(false);
       }
     });
   }
@@ -82,6 +87,18 @@ export class Product {
   }
 
   toggleSidebar() {
-    this.sidebarOpen = !this.sidebarOpen;
+    this.sidebarOpen.update(v => !v);
+  }
+
+  openForm() {
+    this.showForm.set(true);
+  }
+
+  closeForm() {
+    this.showForm.set(false);
+  }
+
+  onProductAdded() {
+    this.loadProducts();
   }
 }

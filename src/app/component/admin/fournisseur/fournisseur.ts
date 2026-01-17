@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import {Component, OnInit, signal, WritableSignal} from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FournisseurService } from '../../../services/fournisseur/fournisseur-service';
 import { Fournisseur } from '../../../models/fournisseur';
@@ -6,19 +6,23 @@ import { Table, TableColumn, TableAction } from '../../table/table';
 import { Sidebar } from '../../sidebar/sidebar';
 import { MobileCard } from '../../mobile-card/mobile-card';
 import { ErrorMessage } from '../../error-message/error-message';
+import {catchError} from 'rxjs/operators';
+import {EMPTY, finalize} from 'rxjs';
+import { FournisseurForm } from './fournisseur-form/fournisseur-form';
 
 @Component({
   selector: 'app-fournisseur',
   standalone: true,
-  imports: [CommonModule, Table, Sidebar, MobileCard, ErrorMessage],
+  imports: [CommonModule, Table, Sidebar, MobileCard, ErrorMessage, FournisseurForm],
   templateUrl: './fournisseur.html',
   styleUrl: './fournisseur.css'
 })
 export class FournisseurComponent implements OnInit {
-  fournisseurs: Fournisseur[] = [];
-  loading = false;
-  error = '';
-  sidebarOpen = false;
+  fournisseurs: WritableSignal<Fournisseur[]> = signal<Fournisseur[]>([]);
+  loading = signal(false);
+  error = signal('');
+  sidebarOpen = signal(false);
+  showForm = signal(false);
 
   columns: TableColumn[] = [
     { key: 'id', label: 'ID', type: 'number' },
@@ -51,21 +55,23 @@ export class FournisseurComponent implements OnInit {
   }
 
   loadFournisseurs() {
-    this.loading = true;
-    this.error = '';
+    this.loading.set(true);
+    this.error.set('');
 
-    this.fournisseurService.getFournisseurs().subscribe({
-      next: (data) => {
-        this.fournisseurs = data;
-        this.loading = false;
-      },
-      error: (error) => {
-        this.error = 'Erreur lors du chargement des fournisseurs';
-        this.loading = false;
+    this.fournisseurService.getFournisseurs().pipe(
+      finalize(() => {
+        this.loading.set(false);
+      }),
+      catchError(error => {
         console.error('Erreur:', error);
-      }
+        this.error.set('Erreur lors du chargement des fournisseurs');
+        return EMPTY;
+      })
+    ).subscribe(data => {
+      this.fournisseurs.set(data);
     });
   }
+
 
   onTableAction = (action: string, item: any) => {
     if (action === 'edit') {
@@ -76,8 +82,19 @@ export class FournisseurComponent implements OnInit {
   }
 
   toggleSidebar() {
-    this.sidebarOpen = !this.sidebarOpen;
+    this.sidebarOpen.update(v => !v);
   }
 
+  openForm() {
+    this.showForm.set(true);
+  }
+
+  closeForm() {
+    this.showForm.set(false);
+  }
+
+  onFournisseurAdded() {
+    this.loadFournisseurs();
+  }
 
 }
