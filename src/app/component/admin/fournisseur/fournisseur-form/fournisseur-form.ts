@@ -1,4 +1,4 @@
-import { Component, Output, EventEmitter, signal, Input, OnInit } from '@angular/core';
+import {Component, Output, EventEmitter, signal, Input, OnInit, OnChanges} from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { FournisseurService } from '../../../../services/fournisseur/fournisseur-service';
@@ -120,7 +120,7 @@ export class FournisseurForm implements OnInit {
     this.errorMessage.set('');
 
     const formData = this.fournisseurForm.getRawValue() as FournisseurRequest;
-    const operation = this.isEditMode() 
+    const operation = this.isEditMode()
       ? this.fournisseurService.updateFournisseur(this.fournisseur!.id, formData)
       : this.fournisseurService.addFournisseur(formData);
 

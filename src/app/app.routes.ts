@@ -12,6 +12,7 @@ import { Home } from './component/home/home';
 import { Product } from './component/product/product';
 import { UnauthorizedComponent } from './component/error-pages/unauthorized/unauthorized';
 import { ForbiddenComponent } from './component/error-pages/forbidden/forbidden';
+import {Users} from './component/admin/users/users';
 
 export const routes: Routes = [
   { path: '', component: Home },
@@ -55,5 +56,10 @@ export const routes: Routes = [
     path: 'commandes',
     component: CommandeComponent,
     canActivate: [authGuard, permissionGuard(['COMMANDE_READ'])]
+  },
+  {
+    path: 'users',
+    component:Users,
+    canActivate: [authGuard, permissionGuard(['USER_MANAGE'])]
   }
 ];

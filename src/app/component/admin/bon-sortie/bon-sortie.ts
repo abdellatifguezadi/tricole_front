@@ -123,7 +123,7 @@ export class BonSortieComponent implements OnInit {
       error: (err) => {
         console.error('Erreur complète:', err);
         let message = 'Erreur lors de la suppression du bon de sortie';
-        
+
         if (err.error) {
           if (typeof err.error === 'string') {
             message = err.error;
@@ -133,7 +133,7 @@ export class BonSortieComponent implements OnInit {
             message = err.error.error;
           }
         }
-        
+
         this.error.set(message);
         this.loading.set(false);
       }

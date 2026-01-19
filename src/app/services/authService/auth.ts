@@ -81,7 +81,7 @@ export class Auth {
     ).pipe(
       map(res => {
         const user: User = {
-          userId: res.userId,
+          id: res.id,
           username: res.username,
           email: res.email,
           fullName: res.fullName,
@@ -143,7 +143,7 @@ export class Auth {
     if (!isPlatformBrowser(this.platformId)) return;
 
     const user: User = {
-      userId: res.userId,
+      id: res.id,
       username: res.username,
       email: res.email,
       fullName: res.fullName,

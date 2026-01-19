@@ -57,6 +57,12 @@ export class Sidebar {
       icon: 'receipt',
       link: '/bons-sortie',
       authorities: ['BON_SORTIE_READ']
+    },
+    {
+      label: 'Users',
+      icon : 'group',
+      link: '/users',
+      authorities: ['USER_MANAGE']
     }
   ];
 

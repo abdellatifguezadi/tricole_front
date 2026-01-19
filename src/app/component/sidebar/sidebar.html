@@ -34,15 +34,7 @@
     </div>
   </div>
 
-  <div class="relative bg-gray-800 px-4 py-2.5 rounded-md my-8">
-    <span class="material-icons inline mr-3 text-gray-400">search</span>
-    <input
-      class="text-sm text-gray-300 outline-none bg-transparent px-1 max-w-[130px]"
-      placeholder="Search..."
-    />
-  </div>
-
-  <ul class="space-y-6 flex-1 mt-4 mb-10">
+  <ul class="space-y-6 flex-1 mt-10 mb-10">
     <ng-container *ngFor="let item of menu">
       <li *ngIf="hasPermission(item.authorities)">
         <a

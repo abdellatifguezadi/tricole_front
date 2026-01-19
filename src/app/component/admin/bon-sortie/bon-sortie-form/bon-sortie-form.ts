@@ -68,14 +68,13 @@ export class BonSortieForm implements OnInit {
 
   populateForm() {
     if (!this.bonSortie) return;
-    
+
     this.bonSortieForm.patchValue({
       dateSortie: this.bonSortie.dateSortie,
       motif: this.bonSortie.motif,
       atelier: this.bonSortie.atelier
     });
 
-    // Clear existing lines and add from bonSortie
     while (this.lignes.length) {
       this.lignes.removeAt(0);
     }

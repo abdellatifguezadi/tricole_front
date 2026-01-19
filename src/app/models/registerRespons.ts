@@ -2,7 +2,7 @@
 export interface RegisterRespons{
   accessToken: string;
   tokenType: string;
-  userId: number;
+  id: number;
   username: string;
   email: string;
   role: string;
