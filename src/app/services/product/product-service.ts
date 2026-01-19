@@ -19,4 +19,16 @@ export class ProductService {
   addProduct(request : ProductRequest): Observable<ProductResponse> {
     return this.http.post<ProductResponse>(this.apiUrl, request , {withCredentials:true})
   }
+
+  updateProduct(id: number, request: ProductRequest): Observable<ProductResponse> {
+    return this.http.put<ProductResponse>(`${this.apiUrl}/${id}`, request, {withCredentials: true});
+  }
+
+  deleteProduct(id: number): Observable<void> {
+    return this.http.delete<void>(`${this.apiUrl}/${id}`, {withCredentials: true});
+  }
+
+  getProductById(id: number): Observable<ProductResponse> {
+    return this.http.get<ProductResponse>(`${this.apiUrl}/${id}`, {withCredentials: true});
+  }
 }

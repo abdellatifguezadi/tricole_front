@@ -1,8 +1,8 @@
-import { Component, Output, EventEmitter, signal } from '@angular/core';
+import { Component, Output, EventEmitter, signal, Input, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { FournisseurService } from '../../../../services/fournisseur/fournisseur-service';
-import { FournisseurRequest } from '../../../../models/fournisseur';
+import { FournisseurRequest, Fournisseur } from '../../../../models/fournisseur';
 import { InputField } from '../../../shared/input-field/input-field';
 import { ModalForm } from '../../../shared/modal-form/modal-form';
 import {catchError, tap} from 'rxjs/operators';
@@ -15,7 +15,8 @@ import {EMPTY, finalize} from 'rxjs';
   templateUrl: './fournisseur-form.html',
   styleUrl: './fournisseur-form.css',
 })
-export class FournisseurForm {
+export class FournisseurForm implements OnInit {
+  @Input() fournisseur: Fournisseur | null = null;
   @Output() closeForm = new EventEmitter<void>();
   @Output() fournisseurAdded = new EventEmitter<void>();
 
@@ -23,6 +24,7 @@ export class FournisseurForm {
 
   isLoading = signal(false);
   errorMessage = signal('');
+  isEditMode = signal(false);
 
   formFields = [
     {
@@ -91,6 +93,21 @@ export class FournisseurForm {
     private fournisseurService: FournisseurService
   ) {}
 
+  ngOnInit() {
+    if (this.fournisseur) {
+      this.isEditMode.set(true);
+      this.fournisseurForm.patchValue({
+        raisonSociale: this.fournisseur.raisonSociale,
+        adresse: this.fournisseur.adresse,
+        ville: this.fournisseur.ville,
+        personneContact: this.fournisseur.personneContact,
+        telephone: this.fournisseur.telephone,
+        email: this.fournisseur.email,
+        ice: this.fournisseur.ice
+      });
+    }
+  }
+
   getFieldError(fieldName: string, errorMessage: string): string {
     const control = this.fournisseurForm.get(fieldName);
     return control?.invalid && control?.touched ? errorMessage : '';
@@ -102,7 +119,12 @@ export class FournisseurForm {
     this.isLoading.set(true);
     this.errorMessage.set('');
 
-    this.fournisseurService.addFournisseur(this.fournisseurForm.getRawValue() as FournisseurRequest).pipe(
+    const formData = this.fournisseurForm.getRawValue() as FournisseurRequest;
+    const operation = this.isEditMode() 
+      ? this.fournisseurService.updateFournisseur(this.fournisseur!.id, formData)
+      : this.fournisseurService.addFournisseur(formData);
+
+    operation.pipe(
       tap(()=> {
         this.fournisseurAdded.emit();
         this.closeForm.emit();

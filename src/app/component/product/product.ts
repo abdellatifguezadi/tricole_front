@@ -22,6 +22,7 @@ export class Product implements OnInit {
   sidebarOpen = signal(false);
 
   showForm = signal(false);
+  selectedProduct = signal<ProductResponse | null>(null);
 
   columns: TableColumn[] = [
     {key: 'id', label: 'ID'},
@@ -80,9 +81,12 @@ export class Product implements OnInit {
 
   onTableAction = (action: string, item: any) => {
     if (action === 'edit') {
-      console.log('Modifier Product:', item);
+      this.selectedProduct.set(item);
+      this.showForm.set(true);
     } else if (action === 'delete') {
-      console.log('Supprimer product:', item);
+      if (confirm('Êtes-vous sûr de vouloir supprimer ce produit ?')) {
+        this.deleteProduct(item.id);
+      }
     }
   }
 
@@ -91,14 +95,36 @@ export class Product implements OnInit {
   }
 
   openForm() {
+    this.selectedProduct.set(null);
     this.showForm.set(true);
   }
 
   closeForm() {
     this.showForm.set(false);
+    this.selectedProduct.set(null);
   }
 
   onProductAdded() {
     this.loadProducts();
+  }
+
+  deleteProduct(id: number) {
+    this.loading.set(true);
+    this.productService.deleteProduct(id).subscribe({
+      next: () => {
+        this.loadProducts();
+      },
+      error: (err) => {
+        console.error('Erreur complète:', err);
+        let message = 'Erreur lors de la suppression du produit';
+
+        if (err.error) {
+          message = err.error.error;
+        }
+
+        this.error.set(message);
+        this.loading.set(false);
+      }
+    });
   }
 }

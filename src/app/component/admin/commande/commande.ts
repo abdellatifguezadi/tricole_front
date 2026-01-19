@@ -25,6 +25,7 @@ export class CommandeComponent implements OnInit {
   sidebarOpen = signal(false);
   showDetails = signal(false);
   showForm = signal(false);
+  selectedCommandeForEdit = signal<Commande | null>(null);
   selectedCommande = signal<Commande | null>(null);
 
   columns: TableColumn[] = [
@@ -82,9 +83,12 @@ export class CommandeComponent implements OnInit {
       this.selectedCommande.set(item);
       this.showDetails.set(true);
     } else if (action === 'edit') {
-      console.log('Modifier commande:', item);
+      this.selectedCommandeForEdit.set(item);
+      this.showForm.set(true);
     } else if (action === 'delete') {
-      console.log('Supprimer commande:', item);
+      if (confirm('Êtes-vous sûr de vouloir supprimer cette commande ?')) {
+        this.deleteCommande(item.id);
+      }
     }
   }
 
@@ -97,15 +101,43 @@ export class CommandeComponent implements OnInit {
   }
 
   openForm() {
+    this.selectedCommandeForEdit.set(null);
     this.showForm.set(true);
   }
 
   closeForm() {
     this.showForm.set(false);
+    this.selectedCommandeForEdit.set(null);
   }
 
   onCommandeAdded() {
     this.loadCommandes();
+  }
+
+  deleteCommande(id: number) {
+    this.loading.set(true);
+    this.commandeService.deleteCommande(id).subscribe({
+      next: () => {
+        this.loadCommandes();
+      },
+      error: (err) => {
+        console.error('Erreur complète:', err);
+        let message = 'Erreur lors de la suppression de la commande';
+        
+        if (err.error) {
+          if (typeof err.error === 'string') {
+            message = err.error;
+          } else if (err.error.message) {
+            message = err.error.message;
+          } else if (err.error.error) {
+            message = err.error.error;
+          }
+        }
+        
+        this.error.set(message);
+        this.loading.set(false);
+      }
+    });
   }
 
   closeDetails() {

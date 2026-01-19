@@ -23,6 +23,7 @@ export class FournisseurComponent implements OnInit {
   error = signal('');
   sidebarOpen = signal(false);
   showForm = signal(false);
+  selectedFournisseur = signal<Fournisseur | null>(null);
 
   columns: TableColumn[] = [
     { key: 'id', label: 'ID', type: 'number' },
@@ -75,9 +76,12 @@ export class FournisseurComponent implements OnInit {
 
   onTableAction = (action: string, item: any) => {
     if (action === 'edit') {
-      console.log('Modifier fournisseur:', item);
+      this.selectedFournisseur.set(item);
+      this.showForm.set(true);
     } else if (action === 'delete') {
-      console.log('Supprimer fournisseur:', item);
+      if (confirm('Êtes-vous sûr de vouloir supprimer ce fournisseur ?')) {
+        this.deleteFournisseur(item.id);
+      }
     }
   }
 
@@ -86,15 +90,36 @@ export class FournisseurComponent implements OnInit {
   }
 
   openForm() {
+    this.selectedFournisseur.set(null);
     this.showForm.set(true);
   }
 
   closeForm() {
     this.showForm.set(false);
+    this.selectedFournisseur.set(null);
   }
 
   onFournisseurAdded() {
     this.loadFournisseurs();
   }
+
+  deleteFournisseur(id: number) {
+    this.loading.set(true);
+    this.fournisseurService.deleteFournisseur(id).subscribe({
+      next: () => {
+        this.loadFournisseurs();
+      },
+      error: (err) => {
+        console.error('Erreur complète:', err);
+        let message = 'Erreur lors de la suppression du fournisseur';
+
+        message = err.error.error ;
+
+        this.error.set(message);
+        this.loading.set(false);
+      }
+    });
+  }
+
 
 }

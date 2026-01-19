@@ -24,7 +24,7 @@ export class BonSortieService {
     return this.http.post<BonSortie>(this.apiUrl, bonSortie, { withCredentials: true });
   }
 
-  updateBonSortie(id: number, bonSortie: Partial<BonSortie>): Observable<BonSortie> {
+  updateBonSortie(id: number, bonSortie: BonSortieRequest): Observable<BonSortie> {
     return this.http.put<BonSortie>(`${this.apiUrl}/${id}`, bonSortie, { withCredentials: true });
   }
 

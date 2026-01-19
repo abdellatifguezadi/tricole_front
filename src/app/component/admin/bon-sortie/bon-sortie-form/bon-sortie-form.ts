@@ -1,9 +1,10 @@
-import { Component, Output, EventEmitter, signal, OnInit } from '@angular/core';
+import { Component, Output, EventEmitter, signal, OnInit, Input } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormArray, ReactiveFormsModule, Validators } from '@angular/forms';
 import { BonSortieService } from '../../../../services/bon-sortie/bon-sortie.service';
 import { ProductService } from '../../../../services/product/product-service';
 import { BonSortieRequest } from '../../../../models/bon-sortie-request';
+import { BonSortie } from '../../../../models/bon-sortie';
 import { InputField } from '../../../shared/input-field/input-field';
 import { SelectField, SelectOption } from '../../../shared/select-field/select-field';
 import { ModalForm } from '../../../shared/modal-form/modal-form';
@@ -18,6 +19,7 @@ import { EMPTY } from 'rxjs';
   styleUrl: './bon-sortie-form.css',
 })
 export class BonSortieForm implements OnInit {
+  @Input() bonSortie: BonSortie | null = null;
   @Output() closeForm = new EventEmitter<void>();
   @Output() bonSortieAdded = new EventEmitter<void>();
 
@@ -26,6 +28,7 @@ export class BonSortieForm implements OnInit {
   isLoading = signal(false);
   errorMessage = signal('');
   produits = signal<any[]>([]);
+  isEditMode = signal(false);
 
   motifOptions: SelectOption[] = [
     { value: 'PRODUCTION', label: 'Production' },
@@ -55,7 +58,35 @@ export class BonSortieForm implements OnInit {
 
   ngOnInit() {
     this.loadProduits();
-    this.addLigne();
+    if (this.bonSortie) {
+      this.isEditMode.set(true);
+      this.populateForm();
+    } else {
+      this.addLigne();
+    }
+  }
+
+  populateForm() {
+    if (!this.bonSortie) return;
+    
+    this.bonSortieForm.patchValue({
+      dateSortie: this.bonSortie.dateSortie,
+      motif: this.bonSortie.motif,
+      atelier: this.bonSortie.atelier
+    });
+
+    // Clear existing lines and add from bonSortie
+    while (this.lignes.length) {
+      this.lignes.removeAt(0);
+    }
+
+    this.bonSortie.ligneBonSorties?.forEach(ligne => {
+      const ligneGroup = this.fb.group({
+        produitId: [ligne.produit?.id, Validators.required],
+        quantite: [ligne.quantite, [Validators.required, Validators.min(1)]]
+      });
+      this.lignes.push(ligneGroup);
+    });
   }
 
   loadProduits() {
@@ -103,7 +134,11 @@ export class BonSortieForm implements OnInit {
       }))
     };
 
-    this.bonSortieService.createBonSortie(request).pipe(
+    const operation = this.isEditMode()
+      ? this.bonSortieService.updateBonSortie(this.bonSortie!.id, request)
+      : this.bonSortieService.createBonSortie(request);
+
+    operation.pipe(
       finalize(() => this.isLoading.set(false)),
       catchError(err => {
         this.errorMessage.set(this.extractErrorMessage(err));

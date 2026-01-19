@@ -19,4 +19,12 @@ export class FournisseurService {
     return this.http.post<Fournisseur>(this.apiUrl, request , {withCredentials:true})
   }
 
+  updateFournisseur(id: number, request: FournisseurRequest): Observable<Fournisseur> {
+    return this.http.put<Fournisseur>(`${this.apiUrl}/${id}`, request, {withCredentials: true});
+  }
+
+  deleteFournisseur(id: number): Observable<void> {
+    return this.http.delete<void>(`${this.apiUrl}/${id}`, {withCredentials: true});
+  }
+
 }

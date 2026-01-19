@@ -1,10 +1,11 @@
-import { Component, Output, EventEmitter, signal, OnInit } from '@angular/core';
+import { Component, Output, EventEmitter, signal, OnInit, Input } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormArray, ReactiveFormsModule, Validators } from '@angular/forms';
 import { CommandeService } from '../../../../services/commande/commande.service';
 import { ProductService } from '../../../../services/product/product-service';
 import { FournisseurService } from '../../../../services/fournisseur/fournisseur-service';
 import { CommandeRequest } from '../../../../models/commande-request';
+import { Commande } from '../../../../models/commande';
 import { InputField } from '../../../shared/input-field/input-field';
 import { SelectField, SelectOption } from '../../../shared/select-field/select-field';
 import { ModalForm } from '../../../shared/modal-form/modal-form';
@@ -19,6 +20,7 @@ import { EMPTY } from 'rxjs';
   styleUrl: './commande-form.css',
 })
 export class CommandeForm implements OnInit {
+  @Input() commande: Commande | null = null;
   @Output() closeForm = new EventEmitter<void>();
   @Output() commandeAdded = new EventEmitter<void>();
 
@@ -28,6 +30,7 @@ export class CommandeForm implements OnInit {
   errorMessage = signal('');
   produits = signal<any[]>([]);
   fournisseurs = signal<any[]>([]);
+  isEditMode = signal(false);
 
   fournisseurOptions = signal<SelectOption[]>([]);
   produitOptions = signal<SelectOption[]>([]);
@@ -47,7 +50,35 @@ export class CommandeForm implements OnInit {
   ngOnInit() {
     this.loadProduits();
     this.loadFournisseurs();
-    this.addLigne();
+    if (this.commande) {
+      this.isEditMode.set(true);
+      this.populateForm();
+    } else {
+      this.addLigne();
+    }
+  }
+
+  populateForm() {
+    if (!this.commande) return;
+    
+    this.commandeForm.patchValue({
+      fournisseurId: this.commande.fournisseur?.id?.toString() || '',
+      dateLivraisonPrevue: this.commande.dateLivraisonPrevue
+    });
+
+    // Clear existing lines and add from commande
+    while (this.lignes.length) {
+      this.lignes.removeAt(0);
+    }
+
+    this.commande.lignesCommande?.forEach(ligne => {
+      const ligneGroup = this.fb.group({
+        produitId: [ligne.produit?.id, Validators.required],
+        quantite: [ligne.quantite, [Validators.required, Validators.min(1)]],
+        prixUnitaire: [ligne.prixUnitaire, [Validators.required, Validators.min(0)]]
+      });
+      this.lignes.push(ligneGroup);
+    });
   }
 
   loadProduits() {
@@ -106,7 +137,11 @@ export class CommandeForm implements OnInit {
       }))
     };
 
-    this.commandeService.createCommande(request).pipe(
+    const operation = this.isEditMode()
+      ? this.commandeService.updateCommande(this.commande!.id, request)
+      : this.commandeService.createCommande(request);
+
+    operation.pipe(
       finalize(() => this.isLoading.set(false)),
       catchError(err => {
         this.errorMessage.set(this.extractErrorMessage(err));

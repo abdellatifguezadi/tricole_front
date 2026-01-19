@@ -1,9 +1,9 @@
 <app-modal-form
-  title="Ajouter une Commande"
+  [title]="isEditMode() ? 'Modifier la Commande' : 'Ajouter une Commande'"
   [form]="commandeForm"
   [isLoading]="isLoading()"
   [errorMessage]="errorMessage()"
-  submitLabel="Créer"
+  [submitLabel]="isEditMode() ? 'Modifier' : 'Créer'"
   (closeModal)="onCancel()"
   (submitForm)="onSubmit()">
 

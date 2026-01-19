@@ -1,9 +1,9 @@
 <app-modal-form
-  title="Ajouter un Bon de Sortie"
+  [title]="isEditMode() ? 'Modifier le Bon de Sortie' : 'Ajouter un Bon de Sortie'"
   [form]="bonSortieForm"
   [isLoading]="isLoading()"
   [errorMessage]="errorMessage()"
-  submitLabel="Créer"
+  [submitLabel]="isEditMode() ? 'Modifier' : 'Créer'"
   (closeModal)="onCancel()"
   (submitForm)="onSubmit()">
 

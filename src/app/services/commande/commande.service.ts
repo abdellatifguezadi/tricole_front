@@ -24,7 +24,7 @@ export class CommandeService {
     return this.http.post<Commande>(this.apiUrl, commande, { withCredentials: true });
   }
 
-  updateCommande(id: number, commande: Partial<Commande>): Observable<Commande> {
+  updateCommande(id: number, commande: CommandeRequest): Observable<Commande> {
     return this.http.put<Commande>(`${this.apiUrl}/${id}`, commande, { withCredentials: true });
   }
 

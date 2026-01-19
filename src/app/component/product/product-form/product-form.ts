@@ -1,7 +1,7 @@
-import {Component, EventEmitter, inject, OnInit, Output, signal} from '@angular/core';
+import {Component, EventEmitter, inject, OnInit, Output, signal, Input} from '@angular/core';
 import {FormBuilder, ReactiveFormsModule, Validators} from '@angular/forms';
 import {ProductService} from '../../../services/product/product-service';
-import {ProductRequest} from '../../../models/Product/productResponse';
+import {ProductRequest, ProductResponse} from '../../../models/Product/productResponse';
 import {catchError, tap} from 'rxjs/operators'
 import {EMPTY, finalize} from 'rxjs';
 import {InputField} from '../../shared/input-field/input-field';
@@ -16,8 +16,9 @@ import {CommonModule} from '@angular/common';
   templateUrl: './product-form.html',
   styleUrl: './product-form.css',
 })
-export class ProductForm{
+export class ProductForm implements OnInit {
 
+  @Input() product: ProductResponse | null = null;
   @Output() closeForm = new EventEmitter<void>();
   @Output() productAdded = new EventEmitter<void>();
 
@@ -25,6 +26,7 @@ export class ProductForm{
 
   isLoading = signal(false);
   errorMessage = signal('');
+  isEditMode = signal(false);
 
   formFields = [
     {
@@ -92,6 +94,21 @@ export class ProductForm{
 
   private productService = inject(ProductService);
 
+  ngOnInit() {
+    if (this.product) {
+      this.isEditMode.set(true);
+      this.productForm.patchValue({
+        reference: this.product.reference,
+        nom: this.product.nom,
+        description: this.product.description,
+        stockActuel: this.product.stockActuel,
+        pointCommande: this.product.pointCommande,
+        uniteMesure: this.product.uniteMesure,
+        categorie: this.product.categorie
+      });
+    }
+  }
+
   getFieldError(fieldName: string, errorMessage: string): string {
     const control = this.productForm.get(fieldName);
     return control?.invalid && control?.touched ? errorMessage : '';
@@ -104,7 +121,12 @@ export class ProductForm{
     this.isLoading.set(true);
     this.errorMessage.set('');
 
-    this.productService.addProduct(this.productForm.getRawValue() as ProductRequest).pipe(
+    const formData = this.productForm.getRawValue() as ProductRequest;
+    const operation = this.isEditMode()
+      ? this.productService.updateProduct(this.product!.id, formData)
+      : this.productService.addProduct(formData);
+
+    operation.pipe(
       tap(() => {
           this.productAdded.emit();
           this.closeForm.emit();
@@ -115,7 +137,6 @@ export class ProductForm{
         const errorMessages: string[] = [];
 
         if (err.error && typeof err.error === 'object') {
-          // Handle specific field errors
           if (typeof err.error.reference === 'string') errorMessages.push(err.error.reference);
           if (typeof err.error.nom === 'string') errorMessages.push(err.error.nom);
           if (typeof err.error.description === 'string') errorMessages.push(err.error.description);
@@ -124,7 +145,6 @@ export class ProductForm{
           if (typeof err.error.uniteMesure === 'string') errorMessages.push(err.error.uniteMesure);
           if (typeof err.error.categorie === 'string') errorMessages.push(err.error.categorie);
 
-          // Handle general error messages
           if (typeof err.error.message === 'string') errorMessages.push(err.error.message);
           if (typeof err.error.error === 'string') errorMessages.push(err.error.error);
         }

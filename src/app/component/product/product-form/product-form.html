@@ -1,9 +1,9 @@
 <app-modal-form
-  title="Ajouter un Fournisseur"
+  [title]="isEditMode() ? 'Modifier le Produit' : 'Ajouter un Produit'"
   [form]="productForm"
   [isLoading]="isLoading()"
   [errorMessage]="errorMessage()"
-  submitLabel="Ajouter"
+  [submitLabel]="isEditMode() ? 'Modifier' : 'Ajouter'"
   (closeModal)="onCancel()"
   (submitForm)="onSubmit()">
 

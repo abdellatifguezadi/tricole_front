@@ -64,6 +64,7 @@
 
   @if (showForm()) {
     <app-product-form
+      [product]="selectedProduct()"
       (closeForm)="closeForm()"
       (productAdded)="onProductAdded()">
     </app-product-form>

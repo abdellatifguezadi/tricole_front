@@ -25,6 +25,7 @@ export class BonSortieComponent implements OnInit {
   sidebarOpen = signal(false);
   showDetails = signal(false);
   showForm = signal(false);
+  selectedBonSortieForEdit = signal<BonSortie | null>(null);
   selectedBonSortie = signal<BonSortie | null>(null);
 
   columns: TableColumn[] = [
@@ -82,9 +83,12 @@ export class BonSortieComponent implements OnInit {
       this.selectedBonSortie.set(item);
       this.showDetails.set(true);
     } else if (action === 'edit') {
-      console.log('Modifier bon de sortie:', item);
+      this.selectedBonSortieForEdit.set(item);
+      this.showForm.set(true);
     } else if (action === 'delete') {
-      console.log('Supprimer bon de sortie:', item);
+      if (confirm('Êtes-vous sûr de vouloir supprimer ce bon de sortie ?')) {
+        this.deleteBonSortie(item.id);
+      }
     }
   }
 
@@ -97,15 +101,43 @@ export class BonSortieComponent implements OnInit {
   }
 
   openForm() {
+    this.selectedBonSortieForEdit.set(null);
     this.showForm.set(true);
   }
 
   closeForm() {
     this.showForm.set(false);
+    this.selectedBonSortieForEdit.set(null);
   }
 
   onBonSortieAdded() {
     this.loadBonSorties();
+  }
+
+  deleteBonSortie(id: number) {
+    this.loading.set(true);
+    this.bonSortieService.deleteBonSortie(id).subscribe({
+      next: () => {
+        this.loadBonSorties();
+      },
+      error: (err) => {
+        console.error('Erreur complète:', err);
+        let message = 'Erreur lors de la suppression du bon de sortie';
+        
+        if (err.error) {
+          if (typeof err.error === 'string') {
+            message = err.error;
+          } else if (err.error.message) {
+            message = err.error.message;
+          } else if (err.error.error) {
+            message = err.error.error;
+          }
+        }
+        
+        this.error.set(message);
+        this.loading.set(false);
+      }
+    });
   }
 
   closeDetails() {

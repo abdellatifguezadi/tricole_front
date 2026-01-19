@@ -85,6 +85,7 @@
 
   @if (showForm()) {
     <app-commande-form
+      [commande]="selectedCommandeForEdit()"
       (closeForm)="closeForm()"
       (commandeAdded)="onCommandeAdded()">
     </app-commande-form>
