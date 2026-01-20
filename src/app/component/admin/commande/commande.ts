@@ -10,6 +10,7 @@ import { DetailsModal, ProductLines, InfoCard, InfoSection } from '../../shared'
 import { CommandeForm } from './commande-form/commande-form';
 import { catchError } from 'rxjs/operators';
 import { EMPTY, finalize } from 'rxjs';
+import { Auth } from '../../../services/authService/auth';
 
 @Component({
   selector: 'app-commande',
@@ -27,6 +28,10 @@ export class CommandeComponent implements OnInit {
   showForm = signal(false);
   selectedCommandeForEdit = signal<Commande | null>(null);
   selectedCommande = signal<Commande | null>(null);
+  canRead = signal(false);
+  canCreate = signal(false);
+  canUpdate = signal(false);
+  canDelete = signal(false);
 
   columns: TableColumn[] = [
     { key: 'id', label: 'ID', type: 'number' },
@@ -39,11 +44,31 @@ export class CommandeComponent implements OnInit {
     { key: 'montantTotal', label: 'Montant Total', type: 'currency' }
   ];
 
-  actions: TableAction[] = [
-    { label: 'Voir détails', action: 'view-details', class: 'text-blue-600 hover:text-blue-900 mr-3' },
-    { label: 'Modifier', action: 'edit', class: 'text-gray-600 hover:text-gray-900 mr-3', showIf: (item) => item.statut === 'EN_ATTENTE' },
-    { label: 'Supprimer', action: 'delete', class: 'text-red-600 hover:text-red-900', showIf: (item) => item.statut === 'EN_ATTENTE' }
-  ];
+  get actions(): TableAction[] {
+    const actions: TableAction[] = [
+      { label: 'Voir détails', action: 'view-details', class: 'text-blue-600 hover:text-blue-900 mr-3' }
+    ];
+
+    if (this.canUpdate()) {
+      actions.push({
+        label: 'Modifier',
+        action: 'edit',
+        class: 'text-gray-600 hover:text-gray-900 mr-3',
+        showIf: (item) => item.statut === 'EN_ATTENTE'
+      });
+    }
+
+    if (this.canDelete()) {
+      actions.push({
+        label: 'Supprimer',
+        action: 'delete',
+        class: 'text-red-600 hover:text-red-900',
+        showIf: (item) => item.statut === 'EN_ATTENTE'
+      });
+    }
+
+    return actions;
+  }
 
   cardFields = [
     { key: 'numeroCommande', label: 'Numéro Commande' },
@@ -54,10 +79,17 @@ export class CommandeComponent implements OnInit {
     { key: 'montantTotal', label: 'Montant Total' }
   ];
 
-  constructor(private commandeService: CommandeService) {}
+  constructor(private commandeService: CommandeService, public auth: Auth) {}
 
   ngOnInit() {
-    this.loadCommandes();
+    this.canRead.set(this.auth.hasPermission('COMMANDE_READ'));
+    this.canCreate.set(this.auth.hasPermission('COMMANDE_CREATE'));
+    this.canUpdate.set(this.auth.hasPermission('COMMANDE_UPDATE'));
+    this.canDelete.set(this.auth.hasPermission('COMMANDE_DELETE'));
+
+    if (this.canRead()) {
+      this.loadCommandes();
+    }
   }
 
   loadCommandes() {
@@ -123,7 +155,7 @@ export class CommandeComponent implements OnInit {
       error: (err) => {
         console.error('Erreur complète:', err);
         let message = 'Erreur lors de la suppression de la commande';
-        
+
         if (err.error) {
           if (typeof err.error === 'string') {
             message = err.error;
@@ -133,7 +165,7 @@ export class CommandeComponent implements OnInit {
             message = err.error.error;
           }
         }
-        
+
         this.error.set(message);
         this.loading.set(false);
       }

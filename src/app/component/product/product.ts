@@ -7,6 +7,9 @@ import {MobileCard} from '../shared/mobile-card/mobile-card';
 import {ErrorMessage} from '../error-message/error-message';
 import {ProductService} from '../../services/product/product-service';
 import {ProductForm} from './product-form/product-form';
+import { Auth } from '../../services/authService/auth';
+
+
 
 
 @Component({
@@ -20,9 +23,13 @@ export class Product implements OnInit {
   loading = signal(false);
   error = signal('');
   sidebarOpen = signal(false);
-
   showForm = signal(false);
   selectedProduct = signal<ProductResponse | null>(null);
+  canRead = signal(false);
+  canCreate = signal(false);
+  canUpdate = signal(false);
+  canDelete = signal(false);
+
 
   columns: TableColumn[] = [
     {key: 'id', label: 'ID'},
@@ -36,10 +43,28 @@ export class Product implements OnInit {
     {key: 'dateModification', label : 'Date De Modification'}
   ];
 
-  actions: TableAction[] = [
-    { label: 'Modifier', action: 'edit', class: 'text-gray-600 hover:text-gray-900 mr-3' },
-    { label: 'Supprimer', action: 'delete', class: 'text-red-600 hover:text-red-900' }
-  ];
+  get actions(): TableAction[] {
+    const actions: TableAction[] = [];
+
+    if (this.canUpdate()) {
+      actions.push({
+        label: 'Modifier',
+        action: 'edit',
+        class: 'text-gray-600 hover:text-gray-900 mr-3'
+      });
+    }
+
+    if (this.canDelete()) {
+      actions.push({
+        label: 'Supprimer',
+        action: 'delete',
+        class: 'text-red-600 hover:text-red-900'
+      });
+    }
+
+    return actions;
+  }
+
 
 
   cardFields = [
@@ -56,11 +81,19 @@ export class Product implements OnInit {
 
 
 
-  constructor(private productService: ProductService) {}
+  constructor(private productService: ProductService , public auth: Auth) {}
 
   ngOnInit() {
-    this.loadProducts();
+    this.canRead.set(this.auth.hasPermission('PRODUIT_READ'));
+    this.canCreate.set(this.auth.hasPermission('PRODUIT_CREATE'));
+    this.canUpdate.set(this.auth.hasPermission('PRODUIT_UPDATE'));
+    this.canDelete.set(this.auth.hasPermission('PRODUIT_DELETE'));
+
+    if (this.canRead()) {
+      this.loadProducts();
+    }
   }
+
 
   loadProducts() {
     this.loading.set(true);

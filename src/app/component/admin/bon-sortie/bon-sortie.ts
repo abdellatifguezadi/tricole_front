@@ -10,6 +10,7 @@ import { DetailsModal, ProductLines, InfoCard, InfoSection } from '../../shared'
 import { BonSortieForm } from './bon-sortie-form/bon-sortie-form';
 import { catchError } from 'rxjs/operators';
 import { EMPTY, finalize } from 'rxjs';
+import { Auth } from '../../../services/authService/auth';
 
 @Component({
   selector: 'app-bon-sortie',
@@ -27,6 +28,10 @@ export class BonSortieComponent implements OnInit {
   showForm = signal(false);
   selectedBonSortieForEdit = signal<BonSortie | null>(null);
   selectedBonSortie = signal<BonSortie | null>(null);
+  canRead = signal(false);
+  canCreate = signal(false);
+  canUpdate = signal(false);
+  canDelete = signal(false);
 
   columns: TableColumn[] = [
     { key: 'id', label: 'ID', type: 'number' },
@@ -39,11 +44,31 @@ export class BonSortieComponent implements OnInit {
     { key: 'dateCreation', label: 'Date Création', type: 'datetime' }
   ];
 
-  actions: TableAction[] = [
-    { label: 'Voir détails', action: 'view-details', class: 'text-blue-600 hover:text-blue-900 mr-3' },
-    { label: 'Modifier', action: 'edit', class: 'text-gray-600 hover:text-gray-900 mr-3', showIf: (item) => item.statut === 'BROUILLON' },
-    { label: 'Supprimer', action: 'delete', class: 'text-red-600 hover:text-red-900', showIf: (item) => item.statut === 'BROUILLON' }
-  ];
+  get actions(): TableAction[] {
+    const actions: TableAction[] = [
+      { label: 'Voir détails', action: 'view-details', class: 'text-blue-600 hover:text-blue-900 mr-3' }
+    ];
+
+    if (this.canUpdate()) {
+      actions.push({
+        label: 'Modifier',
+        action: 'edit',
+        class: 'text-gray-600 hover:text-gray-900 mr-3',
+        showIf: (item) => item.statut === 'BROUILLON'
+      });
+    }
+
+    if (this.canDelete()) {
+      actions.push({
+        label: 'Supprimer',
+        action: 'delete',
+        class: 'text-red-600 hover:text-red-900',
+        showIf: (item) => item.statut === 'BROUILLON'
+      });
+    }
+
+    return actions;
+  }
 
   cardFields = [
     { key: 'numeroBon', label: 'Numéro Bon' },
@@ -54,10 +79,17 @@ export class BonSortieComponent implements OnInit {
     { key: 'montantTotal', label: 'Montant Total' }
   ];
 
-  constructor(private bonSortieService: BonSortieService) {}
+  constructor(private bonSortieService: BonSortieService, public auth: Auth) {}
 
   ngOnInit() {
-    this.loadBonSorties();
+    this.canRead.set(this.auth.hasPermission('BON_SORTIE_READ'));
+    this.canCreate.set(this.auth.hasPermission('BON_SORTIE_CREATE'));
+    this.canUpdate.set(this.auth.hasPermission('BON_SORTIE_UPDATE'));
+    this.canDelete.set(this.auth.hasPermission('BON_SORTIE_DELETE'));
+
+    if (this.canRead()) {
+      this.loadBonSorties();
+    }
   }
 
   loadBonSorties() {

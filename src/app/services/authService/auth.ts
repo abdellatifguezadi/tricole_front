@@ -138,6 +138,11 @@ export class Auth {
     }
   }
 
+  hasPermission(authority: string): boolean {
+    const user = this.currentUserSignal();
+    return !!user?.authorities?.includes(authority);
+  }
+
 
   private handleAuthSuccess(res: AuthResponse): void {
     if (!isPlatformBrowser(this.platformId)) return;

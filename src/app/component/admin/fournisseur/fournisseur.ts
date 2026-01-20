@@ -9,6 +9,8 @@ import { ErrorMessage } from '../../error-message/error-message';
 import {catchError} from 'rxjs/operators';
 import {EMPTY, finalize} from 'rxjs';
 import { FournisseurForm } from './fournisseur-form/fournisseur-form';
+import { Auth } from '../../../services/authService/auth';
+
 
 @Component({
   selector: 'app-fournisseur',
@@ -24,6 +26,10 @@ export class FournisseurComponent implements OnInit {
   sidebarOpen = signal(false);
   showForm = signal(false);
   selectedFournisseur = signal<Fournisseur | null>(null);
+  canRead = signal(false);
+  canCreate = signal(false);
+  canUpdate = signal(false);
+  canDelete = signal(false);
 
   columns: TableColumn[] = [
     { key: 'id', label: 'ID', type: 'number' },
@@ -35,10 +41,27 @@ export class FournisseurComponent implements OnInit {
     { key: 'ice', label: 'ICE' }
   ];
 
-  actions: TableAction[] = [
-    { label: 'Modifier', action: 'edit', class: 'text-gray-600 hover:text-gray-900 mr-3' },
-    { label: 'Supprimer', action: 'delete', class: 'text-red-600 hover:text-red-900' }
-  ];
+  get actions(): TableAction[] {
+    const actions: TableAction[] = [];
+
+    if (this.canUpdate()) {
+      actions.push({
+        label: 'Modifier',
+        action: 'edit',
+        class: 'text-gray-600 hover:text-gray-900 mr-3'
+      });
+    }
+
+    if (this.canDelete()) {
+      actions.push({
+        label: 'Supprimer',
+        action: 'delete',
+        class: 'text-red-600 hover:text-red-900'
+      });
+    }
+
+    return actions;
+  }
 
   cardFields = [
     { key: 'id', label: 'ID' },
@@ -49,11 +72,20 @@ export class FournisseurComponent implements OnInit {
     { key: 'ice', label: 'ICE' }
   ];
 
-  constructor(private fournisseurService: FournisseurService) {}
+  constructor(private fournisseurService: FournisseurService , public auth: Auth) {}
+
 
   ngOnInit() {
-    this.loadFournisseurs();
+    this.canRead.set(this.auth.hasPermission('FOURNISSEUR_READ'));
+    this.canCreate.set(this.auth.hasPermission('FOURNISSEUR_CREATE'));
+    this.canUpdate.set(this.auth.hasPermission('FOURNISSEUR_UPDATE'));
+    this.canDelete.set(this.auth.hasPermission('FOURNISSEUR_DELETE'));
+
+    if (this.canRead()) {
+      this.loadFournisseurs();
+    }
   }
+
 
   loadFournisseurs() {
     this.loading.set(true);
@@ -111,9 +143,8 @@ export class FournisseurComponent implements OnInit {
       },
       error: (err) => {
         console.error('Erreur complète:', err);
-        let message = 'Erreur lors de la suppression du fournisseur';
 
-        message = err.error.error ;
+        let message = err.error.error ;
 
         this.error.set(message);
         this.loading.set(false);
