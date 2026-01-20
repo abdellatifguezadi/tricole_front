@@ -36,7 +36,18 @@
 
   <ul class="space-y-6 flex-1 mt-10 mb-10">
     <ng-container *ngFor="let item of menu">
-      <li *ngIf="hasPermission(item.authorities)">
+      @if(hasPermission(item.authorities)){
+        <li>
+          <a
+            [routerLink]="item.link"
+            class="text-gray-300 hover:text-teal-400 text-[15px] font-normal flex items-center rounded-md p-2 hover:bg-gray-800 transition-colors"
+          >
+            <i class="material-icons text-teal-500 text-[18px] mr-3">{{ item.icon }}</i>
+            {{ item.label }}
+          </a>
+        </li>
+      }
+   <!-- <li *ngIf="hasPermission(item.authorities)">
         <a
           [routerLink]="item.link"
           class="text-gray-300 hover:text-teal-400 text-[15px] font-normal flex items-center rounded-md p-2 hover:bg-gray-800 transition-colors"
@@ -44,7 +55,7 @@
           <i class="material-icons text-teal-500 text-[18px] mr-3">{{ item.icon }}</i>
           {{ item.label }}
         </a>
-      </li>
+      </li>  -->
     </ng-container>
   </ul>
 

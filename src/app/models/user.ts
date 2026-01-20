@@ -4,5 +4,12 @@ export interface User {
   email: string;
   fullName?: string;
   role: string;
-  authorities: string[];
+  authorities?: string[];
+  permissions?: Permissions[];
+}
+
+export interface Permissions {
+  permissionName : string;
+  description : string;
+  active : boolean;
 }
