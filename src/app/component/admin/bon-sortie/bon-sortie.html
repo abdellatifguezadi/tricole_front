@@ -88,6 +88,40 @@
         title="Produits Sortis"
         [showPricing]="false">
       </app-product-lines>
+
+      <div class="mt-6 flex justify-end space-x-3 border-t pt-4">
+        @if (canValidate() && selectedBonSortie()?.statut === 'BROUILLON') {
+          <button
+            (click)="validateFromDetails()"
+            class="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors">
+            Valider
+          </button>
+        }
+
+        @if (canCancel() && (selectedBonSortie()?.statut === 'BROUILLON' )) {
+          <button
+            (click)="cancelFromDetails()"
+            class="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors">
+            Annuler
+          </button>
+        }
+
+    <!--    @if (canUpdate() && selectedBonSortie()?.statut === 'BROUILLON') {
+          <button
+            (click)="editFromDetails()"
+            class="px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-colors">
+            Modifier
+          </button>
+        }
+
+        @if (canDelete() && selectedBonSortie()?.statut === 'BROUILLON') {
+          <button
+            (click)="deleteFromDetails()"
+            class="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors">
+            Supprimer
+          </button>
+        } -->
+      </div>
     }
   </app-details-modal>
 

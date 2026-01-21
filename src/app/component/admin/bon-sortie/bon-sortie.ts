@@ -32,6 +32,8 @@ export class BonSortieComponent implements OnInit {
   canCreate = signal(false);
   canUpdate = signal(false);
   canDelete = signal(false);
+  canValidate = signal(false);
+  canCancel = signal(false);
 
   columns: TableColumn[] = [
     { key: 'id', label: 'ID', type: 'number' },
@@ -57,6 +59,24 @@ export class BonSortieComponent implements OnInit {
         showIf: (item) => item.statut === 'BROUILLON'
       });
     }
+/**
+    if (this.canValidate()) {
+      actions.push({
+        label: 'Valider',
+        action: 'validate',
+        class: 'text-green-600 hover:text-green-900 mr-3',
+        showIf: (item) => item.statut === 'BROUILLON'
+      });
+    }
+
+    if (this.canCancel()) {
+      actions.push({
+        label: 'Annuler',
+        action: 'cancel',
+        class: 'text-orange-600 hover:text-orange-900 mr-3',
+        showIf: (item) => item.statut === 'BROUILLON' || item.statut === 'VALIDE'
+      });
+    }**/
 
     if (this.canDelete()) {
       actions.push({
@@ -86,6 +106,8 @@ export class BonSortieComponent implements OnInit {
     this.canCreate.set(this.auth.hasPermission('BON_SORTIE_CREATE'));
     this.canUpdate.set(this.auth.hasPermission('BON_SORTIE_UPDATE'));
     this.canDelete.set(this.auth.hasPermission('BON_SORTIE_DELETE'));
+    this.canValidate.set(this.auth.hasPermission('BON_SORTIE_VALIDATE'));
+    this.canCancel.set(this.auth.hasPermission('BON_SORTIE_CANCEL'));
 
     if (this.canRead()) {
       this.loadBonSorties();
@@ -117,6 +139,14 @@ export class BonSortieComponent implements OnInit {
     } else if (action === 'edit') {
       this.selectedBonSortieForEdit.set(item);
       this.showForm.set(true);
+    } else if (action === 'validate') {
+      if (confirm('Êtes-vous sûr de vouloir valider ce bon de sortie ?')) {
+        this.validateBonSortie(item.id);
+      }
+    } else if (action === 'cancel') {
+      if (confirm('Êtes-vous sûr de vouloir annuler ce bon de sortie ?')) {
+        this.cancelBonSortie(item.id);
+      }
     } else if (action === 'delete') {
       if (confirm('Êtes-vous sûr de vouloir supprimer ce bon de sortie ?')) {
         this.deleteBonSortie(item.id);
@@ -172,9 +202,94 @@ export class BonSortieComponent implements OnInit {
     });
   }
 
+  validateBonSortie(id: number) {
+    this.loading.set(true);
+    this.bonSortieService.validateBonSortie(id).subscribe({
+      next: () => {
+        this.loadBonSorties();
+      },
+      error: (err) => {
+        console.error('Erreur complète:', err);
+        let message = 'Erreur lors de la validation du bon de sortie';
+
+        if (err.error) {
+          if (typeof err.error === 'string') {
+            message = err.error;
+          } else if (err.error.message) {
+            message = err.error.message;
+          } else if (err.error.error) {
+            message = err.error.error;
+          }
+        }
+
+        this.error.set(message);
+        this.loading.set(false);
+      }
+    });
+  }
+
+  cancelBonSortie(id: number) {
+    this.loading.set(true);
+    this.bonSortieService.cancelBonSortie(id).subscribe({
+      next: () => {
+        this.loadBonSorties();
+      },
+      error: (err) => {
+        console.error('Erreur complète:', err);
+        let message = 'Erreur lors de l\'annulation du bon de sortie';
+
+        if (err.error) {
+          if (typeof err.error === 'string') {
+            message = err.error;
+          } else if (err.error.message) {
+            message = err.error.message;
+          } else if (err.error.error) {
+            message = err.error.error;
+          }
+        }
+
+        this.error.set(message);
+        this.loading.set(false);
+      }
+    });
+  }
+
   closeDetails() {
     this.showDetails.set(false);
     this.selectedBonSortie.set(null);
+  }
+
+  validateFromDetails() {
+    const bonSortie = this.selectedBonSortie();
+    if (bonSortie && confirm('Êtes-vous sûr de vouloir valider ce bon de sortie ?')) {
+      this.validateBonSortie(bonSortie.id);
+      this.closeDetails();
+    }
+  }
+
+  cancelFromDetails() {
+    const bonSortie = this.selectedBonSortie();
+    if (bonSortie && confirm('Êtes-vous sûr de vouloir annuler ce bon de sortie ?')) {
+      this.cancelBonSortie(bonSortie.id);
+      this.closeDetails();
+    }
+  }
+
+  editFromDetails() {
+    const bonSortie = this.selectedBonSortie();
+    if (bonSortie) {
+      this.selectedBonSortieForEdit.set(bonSortie);
+      this.showForm.set(true);
+      this.closeDetails();
+    }
+  }
+
+  deleteFromDetails() {
+    const bonSortie = this.selectedBonSortie();
+    if (bonSortie && confirm('Êtes-vous sûr de vouloir supprimer ce bon de sortie ?')) {
+      this.deleteBonSortie(bonSortie.id);
+      this.closeDetails();
+    }
   }
 
 

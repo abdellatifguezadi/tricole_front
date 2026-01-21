@@ -31,4 +31,12 @@ export class BonSortieService {
   deleteBonSortie(id: number): Observable<void> {
     return this.http.delete<void>(`${this.apiUrl}/${id}`, { withCredentials: true });
   }
+
+  validateBonSortie(id: number): Observable<BonSortie> {
+    return this.http.put<BonSortie>(`${this.apiUrl}/validation/${id}`, {}, { withCredentials: true });
+  }
+
+  cancelBonSortie(id: number): Observable<BonSortie> {
+    return this.http.put<BonSortie>(`${this.apiUrl}/annulation/${id}`, {}, { withCredentials: true });
+  }
 }
