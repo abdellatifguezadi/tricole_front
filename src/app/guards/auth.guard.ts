@@ -35,6 +35,7 @@ export const loginGuard = () => {
   const authService = inject(Auth);
   const router = inject(Router);
 
+
   if (authService.isAuthenticated()) {
     const roleRoute = authService.getRoleBasedRoute();
     router.navigate([roleRoute]);
