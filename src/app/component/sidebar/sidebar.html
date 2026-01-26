@@ -36,7 +36,7 @@
 
   <ul class="space-y-6 flex-1 mt-10 mb-10">
     <ng-container *ngFor="let item of menu">
-      @if(hasPermission(item.authorities)){
+      @if(hasPermission(item.authorities) || item.authorities.length === 0){
         <li>
           <a
             [routerLink]="item.link"

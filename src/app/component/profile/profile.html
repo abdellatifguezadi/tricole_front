@@ -1,0 +1,39 @@
+<div class="flex min-h-screen">
+  <app-sidebar></app-sidebar>
+  
+  <div class="flex-1 p-8 bg-gray-50 ml-64 flex justify-center">
+    <div class="w-full max-w-2xl">
+      <div class="mb-8 text-center">
+        <h1 class="text-3xl font-bold text-gray-800">Profil Utilisateur</h1>
+      </div>
+      
+      @if (user(); as currentUser) {
+        <div class="bg-white rounded-xl p-8 shadow-lg border border-gray-200">
+          <h2 class="text-2xl font-semibold text-gray-800 mb-6 pb-3 border-b-3 border-blue-500 text-center">Informations Personnelles</h2>
+          
+          <div class="space-y-6">
+            <div class="flex justify-between items-center py-4 border-b border-gray-100">
+              <label class="font-semibold text-gray-600">Nom complet:</label>
+              <span class="text-gray-800">{{ currentUser.fullName }}</span>
+            </div>
+            
+            <div class="flex justify-between items-center py-4 border-b border-gray-100">
+              <label class="font-semibold text-gray-600">Nom d'utilisateur:</label>
+              <span class="text-gray-800">{{ currentUser.username }}</span>
+            </div>
+            
+            <div class="flex justify-between items-center py-4 border-b border-gray-100">
+              <label class="font-semibold text-gray-600">Email:</label>
+              <span class="text-gray-800">{{ currentUser.email }}</span>
+            </div>
+            
+            <div class="flex justify-between items-center py-4">
+              <label class="font-semibold text-gray-600">Rôle:</label>
+              <span class="bg-gradient-to-r from-blue-500 to-blue-600 text-white px-4 py-2 rounded-full text-sm font-medium shadow-md">{{ currentUser.role }}</span>
+            </div>
+          </div>
+        </div>
+      }
+    </div>
+  </div>
+</div>

@@ -1,0 +1,135 @@
+<div class="min-h-screen bg-teal-50">
+  <app-sidebar [open]="sidebarOpen" (closeSidebar)="toggleSidebar()"></app-sidebar>
+
+  <div class="p-8 lg:ml-[260px]">
+    <div class="bg-white border-b border-gray-200 px-8 py-6">
+      <div class="flex items-center justify-between">
+        <div class="flex items-center gap-3">
+          <button
+            (click)="toggleSidebar()"
+            type="button"
+            class="inline-flex items-center justify-center p-2 bg-teal-700 text-white rounded-md hover:bg-teal-800 lg:hidden"
+          >
+            <span class="material-icons text-white text-lg">menu</span>
+          </button>
+
+          <div>
+            <h1 class="text-3xl font-bold text-gray-800">Dashboard Responsable d'achats</h1>
+            <p class="text-gray-600 mt-1">Vue d'ensemble des statistiques</p>
+          </div>
+        </div>
+        <div class="w-12 h-12 bg-teal-700 rounded-full flex items-center justify-center">
+          <span class="material-icons text-white text-lg">verified</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="p-8">
+      <app-error-message [error]="error" (retry)="loadStats()"> </app-error-message>
+
+      @if (stats) {
+        <div class="space-y-8">
+          <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+            <app-stat-card title="Total Utilisateurs" [value]="stats.totalUtilisateurs">
+              <span class="material-icons text-white text-xs">people</span>
+            </app-stat-card>
+
+            <app-stat-card title="Total Produits" [value]="stats.totalProduits">
+              <span class="material-icons text-white text-xs">inventory_2</span>
+            </app-stat-card>
+
+            <app-stat-card title="Total Fournisseurs" [value]="stats.totalFournisseurs">
+              <span class="material-icons text-white text-xs">store</span>
+            </app-stat-card>
+
+            <app-stat-card title="Total Commandes" [value]="stats.totalCommandes">
+              <span class="material-icons text-white text-xs">shopping_cart</span>
+            </app-stat-card>
+          </div>
+
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <app-stat-card title="Valeur Total Stock" [value]="stats.valeurTotalStock + ' €'">
+              <span class="material-icons text-white text-xs">savings</span>
+            </app-stat-card>
+
+            <app-stat-card
+              title="Montant Total Commandes"
+              [value]="stats.montantTotalCommandes + ' €'"
+            >
+              <span class="material-icons text-white text-xs">attach_money</span>
+            </app-stat-card>
+
+            <app-stat-card title="Montant Total Sorties" [value]="stats.montantTotalSorties + ' €'">
+              <span class="material-icons text-white text-xs">trending_down</span>
+            </app-stat-card>
+          </div>
+
+          @if (stats.produitsEnRupture > 0 || stats.produitsProchesRupture > 0 ||
+          stats.commandesEnRetard > 0) {
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+              @if (stats.produitsEnRupture > 0) {
+                <app-alert-card
+                  title="Produits en rupture"
+                  [message]="stats.produitsEnRupture + ' produits en rupture de stock'"
+                  type="error"
+                >
+                </app-alert-card>
+              } @if (stats.produitsProchesRupture > 0) {
+              <app-alert-card
+                title="Produits proches rupture"
+                [message]="stats.produitsProchesRupture + ' produits proches de la rupture'"
+                type="warning"
+              >
+              </app-alert-card>
+            } @if (stats.commandesEnRetard > 0) {
+              <app-alert-card
+                title="Commandes en retard"
+                [message]="stats.commandesEnRetard + ' commandes en retard'"
+                type="error"
+              >
+              </app-alert-card>
+            }
+            </div>
+          }
+
+          <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            <app-chart-card title="Utilisateurs par Rôle" [data]="stats.utilisateursParRole">
+            </app-chart-card>
+
+            <app-chart-card title="Commandes par Statut" [data]="stats.commandesParStatut">
+            </app-chart-card>
+
+            <app-chart-card title="Bons Sortie par Statut" [data]="stats.bonsSortieParStatut">
+            </app-chart-card>
+
+            <app-chart-card title="Sorties par Atelier" [data]="stats.sortiesParAtelier">
+            </app-chart-card>
+          </div>
+
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <app-stat-card title="Nouvelles Commandes (Mois)" [value]="stats.nouvellesCommandesMois">
+              <span class="material-icons text-white text-xs">add_shopping_cart</span>
+            </app-stat-card>
+
+            <app-stat-card title="Nouveaux Bons Sortie (Mois)" [value]="stats.nouveauxBonsSortieMois">
+              <span class="material-icons text-white text-xs">receipt_long</span>
+            </app-stat-card>
+
+            <app-stat-card title="Mouvements Stock (Mois)" [value]="stats.mouvementStockMois">
+              <span class="material-icons text-white text-xs">inventory</span>
+            </app-stat-card>
+          </div>
+        </div>
+      } @if (!stats) {
+      <div class="flex justify-center items-center h-64">
+        <div class="text-center">
+          <div
+            class="w-16 h-16 border-4 border-teal-700 border-t-transparent rounded-full animate-spin mx-auto mb-4"
+          ></div>
+          <p class="text-gray-600 font-medium">Chargement des statistiques...</p>
+        </div>
+      </div>
+    }
+    </div>
+  </div>
+</div>

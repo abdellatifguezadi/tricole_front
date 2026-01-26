@@ -63,6 +63,12 @@ export class Sidebar {
       icon : 'group',
       link: '/users',
       authorities: ['USER_MANAGE']
+    },
+    {
+      label: 'Profil',
+      icon: 'person',
+      link: '/profile',
+      authorities: []
     }
   ];
 

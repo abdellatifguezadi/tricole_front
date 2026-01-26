@@ -121,21 +121,7 @@ export class Auth {
   }
 
   getRoleBasedRoute(): string {
-    const user = this.currentUserSignal();
-    if (!user?.role) return '/login';
-
-    switch (user.role.toLowerCase()) {
-      case 'admin':
-        return '/admin_dashboard';
-      case 'user':
-        return '/user_dashboard';
-      case 'manager':
-        return '/manager_dashboard';
-      case 'magasinier':
-        return '/magasinier_dashboard';
-      default:
-        return '/login';
-    }
+    return '/profile';
   }
 
   hasPermission(authority: string): boolean {

@@ -9,6 +9,7 @@ export interface User {
 }
 
 export interface Permissions {
+  id : number;
   permissionName : string;
   description : string;
   active : boolean;

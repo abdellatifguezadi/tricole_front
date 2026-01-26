@@ -8,8 +8,10 @@ import { CommandeComponent } from './component/admin/commande/commande';
 import { authGuard, loginGuard } from './guards/auth.guard';
 import { permissionGuard } from './guards/permission.guard';
 import { MagasinierDashboard } from './component/magasinier/magasinier-dashboard/magasinier-dashboard';
+import { ResponsableAchatsDashboard } from './component/responsable-achats/responsable-achats-dashboard/responsable-achats-dashboard';
 import { Home } from './component/home/home';
 import { Product } from './component/product/product';
+import { Profile } from './component/profile/profile';
 import { UnauthorizedComponent } from './component/error-pages/unauthorized/unauthorized';
 import { ForbiddenComponent } from './component/error-pages/forbidden/forbidden';
 import {Users} from './component/admin/users/users';
@@ -19,6 +21,7 @@ export const routes: Routes = [
   { path: 'home', component: Home },
   { path: 'login', component: Login, canActivate: [loginGuard] },
   { path: 'register', component: Register },
+  { path: 'profile', component: Profile, canActivate: [authGuard] },
 
   { path: 'unauthorized', component: UnauthorizedComponent },
   { path: '401', redirectTo: 'unauthorized' },
@@ -35,7 +38,12 @@ export const routes: Routes = [
   {
     path: 'magasinier_dashboard',
     component: MagasinierDashboard,
-    canActivate: [authGuard, permissionGuard(['STOCK_READ', 'STOCK_HISTORIQUE'])]
+    canActivate: [authGuard, permissionGuard(['STOCK_HISTORIQUE'])]
+  },
+  {
+    path: 'responsable_achats_dashboard',
+    component: ResponsableAchatsDashboard,
+    canActivate: [authGuard]
   },
   {
     path: 'fournisseurs',
