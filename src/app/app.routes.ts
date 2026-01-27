@@ -8,7 +8,6 @@ import { CommandeComponent } from './component/admin/commande/commande';
 import { authGuard, loginGuard } from './guards/auth.guard';
 import { permissionGuard } from './guards/permission.guard';
 import { MagasinierDashboard } from './component/magasinier/magasinier-dashboard/magasinier-dashboard';
-import { ResponsableAchatsDashboard } from './component/responsable-achats/responsable-achats-dashboard/responsable-achats-dashboard';
 import { Home } from './component/home/home';
 import { Product } from './component/product/product';
 import { Profile } from './component/profile/profile';
@@ -31,43 +30,38 @@ export const routes: Routes = [
   {
     path: 'admin_dashboard',
     component: AdminDashboard,
-    canActivate: [authGuard, permissionGuard(['USER_MANAGE', 'STATISTIQUES_READ'])]
+    canActivate: [ permissionGuard(['USER_MANAGE', 'STATISTIQUES_READ'])]
   },
   { path: 'user_dashboard', component: AdminDashboard, canActivate: [authGuard] },
   { path: 'manager_dashboard', component: AdminDashboard, canActivate: [authGuard] },
   {
     path: 'magasinier_dashboard',
     component: MagasinierDashboard,
-    canActivate: [authGuard, permissionGuard(['STOCK_HISTORIQUE'])]
-  },
-  {
-    path: 'responsable_achats_dashboard',
-    component: ResponsableAchatsDashboard,
-    canActivate: [authGuard]
+    canActivate: [ permissionGuard(['STOCK_HISTORIQUE'])]
   },
   {
     path: 'fournisseurs',
     component: FournisseurComponent,
-    canActivate: [authGuard, permissionGuard(['FOURNISSEUR_READ'])]
+    canActivate: [ permissionGuard(['FOURNISSEUR_READ'])]
   },
   {
     path: 'product',
     component: Product,
-    canActivate: [authGuard, permissionGuard(['PRODUIT_READ'])]
+    canActivate: [ permissionGuard(['PRODUIT_READ'])]
   },
   {
     path: 'bons-sortie',
     component: BonSortieComponent,
-    canActivate: [authGuard, permissionGuard(['STOCK_READ'])]
+    canActivate: [ permissionGuard(['STOCK_READ'])]
   },
   {
     path: 'commandes',
     component: CommandeComponent,
-    canActivate: [authGuard, permissionGuard(['COMMANDE_READ'])]
+    canActivate: [ permissionGuard(['COMMANDE_READ'])]
   },
   {
     path: 'users',
     component:Users,
-    canActivate: [authGuard, permissionGuard(['USER_MANAGE'])]
+    canActivate: [ permissionGuard(['USER_MANAGE'])]
   }
 ];

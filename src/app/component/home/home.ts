@@ -48,7 +48,6 @@ export class Home {
   navigateToDashboard() {
     const user = this.authService.getCurrentUser();
     if (user) {
-      // Redirect based on permissions
       if (this.authService.hasAnyPermission(['USER_MANAGE', 'STATISTIQUES_READ'])) {
         this.router.navigate(['/admin_dashboard']);
       } else if (this.authService.hasAnyPermission(['STOCK_READ', 'STOCK_HISTORIQUE'])) {

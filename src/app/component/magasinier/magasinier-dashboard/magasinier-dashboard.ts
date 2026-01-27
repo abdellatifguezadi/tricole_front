@@ -85,7 +85,6 @@ export class MagasinierDashboard implements OnInit {
         console.log('Mouvements chargés:', response);
       },
       error: (error) => {
-        console.error('Erreur lors du chargement des mouvements:', error);
         this.error = 'Erreur lors du chargement des données. Veuillez réessayer.';
         this.mouvements = [];
         this.totalElements = 0;

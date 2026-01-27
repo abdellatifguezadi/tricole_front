@@ -43,7 +43,7 @@ export class Register {
 
       catchError(err => {
         console.error(err);
-        const message = err?.error?.error ?? 'Erreur inattendue';
+        const message = err.error.error ?? 'Erreur inattendue';
         this.errorMessage.set(message);
         return of(null);
       }),

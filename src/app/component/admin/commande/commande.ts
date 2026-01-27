@@ -154,17 +154,7 @@ export class CommandeComponent implements OnInit {
       },
       error: (err) => {
         console.error('Erreur complète:', err);
-        let message = 'Erreur lors de la suppression de la commande';
-
-        if (err.error) {
-          if (typeof err.error === 'string') {
-            message = err.error;
-          } else if (err.error.message) {
-            message = err.error.message;
-          } else if (err.error.error) {
-            message = err.error.error;
-          }
-        }
+        let message = err.error.error ;
 
         this.error.set(message);
         this.loading.set(false);

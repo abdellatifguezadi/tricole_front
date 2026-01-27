@@ -16,9 +16,7 @@ export const permissionGuard = (requiredAuthorities: string[]): CanActivateFn =>
       );
 
       if (!hasPermission) {
-        router.navigate(['/forbidden'], {
-          state: { message: 'Vous n\'avez pas les permissions nécessaires pour accéder à cette ressource.' }
-        });
+        router.navigate(['/forbidden']);
         return false;
       }
 

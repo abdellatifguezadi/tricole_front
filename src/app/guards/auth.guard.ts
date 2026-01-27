@@ -17,15 +17,11 @@ export const authGuard = () => {
       if (user) {
         return true;
       }
-      router.navigate(['/unauthorized'], {
-        state: { message: 'Vous devez vous connecter pour accéder à cette page.' }
-      });
+      router.navigate(['/unauthorized']);
       return false;
     }),
     catchError(() => {
-      router.navigate(['/unauthorized'], {
-        state: { message: 'Session invalide. Veuillez vous reconnecter.' }
-      });
+      router.navigate(['/unauthorized']);
       return of(false);
     })
   );
