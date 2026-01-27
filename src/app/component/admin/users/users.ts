@@ -8,8 +8,10 @@ import {ErrorMessage} from '../../error-message/error-message';
 import {MobileCard} from '../../shared/mobile-card/mobile-card';
 import {Sidebar} from '../../sidebar/sidebar';
 import {Table, TableAction, TableColumn} from '../../shared/table/table';
+import {RoleAssignment} from '../role-assignment/role-assignment';
 import {FormGroup} from '@angular/forms';
 import {Auth} from '../../../services/authService/auth';
+import {RoleResponse} from '../../../models/roleResponse';
 
 @Component({
   selector: 'app-users',
@@ -18,7 +20,8 @@ import {Auth} from '../../../services/authService/auth';
     ErrorMessage,
     MobileCard,
     Sidebar,
-    Table
+    Table,
+    RoleAssignment
   ],
   templateUrl: './users.html',
   styleUrl: './users.css',
@@ -34,6 +37,7 @@ export class Users implements OnInit {
   selectedPermissions = signal<Permissions[]>([]);
   permissionLoading = signal(false);
   permissionError = signal('');
+  showRoleModal = signal(false);
 
 
   columns: TableColumn[] = [
@@ -68,7 +72,7 @@ export class Users implements OnInit {
   ]
 
 
-  constructor(private userService: UserService ) {
+  constructor(private userService: UserService) {
   }
   authService : Auth =  inject(Auth)
 
@@ -113,7 +117,7 @@ export class Users implements OnInit {
     if (action === 'permissions') {
       this.openPermissions(item);
     } else if (action === 'addRole') {
-      console.log('add role');
+      this.openRoleModal(item);
     }
   }
 
@@ -171,6 +175,21 @@ export class Users implements OnInit {
       this.users.set(updatedUsers);
 
     });
+  }
+
+  openRoleModal(user: User): void {
+    this.selectedUser.set(user);
+    this.showRoleModal.set(true);
+  }
+
+  closeRoleModal(): void {
+    this.showRoleModal.set(false);
+    this.selectedUser.set(null);
+  }
+
+  onRoleAssigned(): void {
+    this.loadUsers();
+    this.closeRoleModal();
   }
 
 }

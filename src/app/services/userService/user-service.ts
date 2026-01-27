@@ -25,4 +25,8 @@ export class UserService {
   deactivePermission(userId:number,permissionId:number):Observable<void>{
     return this.http.patch<void>(`${this.apiUrl}/${userId}/permissions/${permissionId}/deactivate`, {withCredentials: true});
   }
+
+  assignRole(userId: number, roleId: number): Observable<{message: string}> {
+    return this.http.post<{message: string}>(`${this.apiUrl}/${userId}/role/${roleId}`, {}, { withCredentials: true });
+  }
 }
